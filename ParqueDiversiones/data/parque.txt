@@ -1,0 +1,1 @@
+Montaña Rusa;Mecánica;200,120,100,50,Ninguna,3,true;5;100;EDAD:18,ALTURA:150.0;DIAMANTE

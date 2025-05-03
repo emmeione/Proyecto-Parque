@@ -1,0 +1,2 @@
+Montaña Rusa;Mecánica;200,120,100,50,Ninguna,3,true;5;100;EDAD:18,ALTURA:150.0,EDAD:10;DIAMANTE
+Espectáculo canino;Cultural;2025-03-18,true,trueEspectáculo;10;50;;FAMILIAR

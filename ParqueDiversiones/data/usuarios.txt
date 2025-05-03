@@ -1,0 +1,6 @@
+Beatriz;Pinzón;10308437824;b.pinzon;tandivinoo;25;1.7;Cliente
+Armando;Mendoza;1010084918;a.mendoza;brutaslapoliciaaaa;Cajero;false;false;false;Empleado
+Marcela;Valencia;102934876;ma.valencia;peroyotemerezcoooo;Cocinero;true;false;false;Empleado
+Patricia;Fernandez;13982783;pati.fer;yllegaronlosmeseroooos;Operador de Atracción;false;true;false;Empleado
+Hugo;Lombardi;1288374;hugo.lombardi;llegolamagiallegoelcolorllegolavida;Operador de Atracción;false;false;true;Empleado
+Nicolás;Mora;93812;nico.mora;esaeslafamaquetengoahora;Servicio General;false;false;false;Empleado
