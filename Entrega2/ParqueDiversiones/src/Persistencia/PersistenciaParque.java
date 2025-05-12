@@ -1,5 +1,16 @@
 package Persistencia;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.io.BufferedReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import Administrador.Parque;
+import Usuarios.Cliente;
+import Usuarios.Empleado;
 import Atracciones.Atraccion;
 import Atracciones.Cultural;
 import Atracciones.Mecanica;
@@ -8,30 +19,23 @@ import Restricciones.Restriccion;
 import Restricciones.RestriccionAltura;
 import Restricciones.RestriccionEdad;
 import Roles.Cajero;
+import Roles.Cocinero;
+import Roles.Rol;
 import Tiquetes.Tiquete;
-import Tiquetes.TiqueteBasico;
 import Tiquetes.TiqueteDiamante;
-import Usuarios.Cliente;
-import Usuarios.Empleado;
 
-import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+public class PersistenciaParque {
 
-import Administrador.Parque;
-
-public class PersistenciaAtracciones {
 //	Persistencia con archivos de texto
 	private Parque parque;
 	
-	public PersistenciaAtracciones(Parque p) {
+	public PersistenciaParque(Parque p) {
 
 		parque = p;
 	}
 	
-	public void guardarAtracciones() throws FileNotFoundException{
-		PrintWriter escritor = new PrintWriter(new File("./data/atracciones.txt"));
+	public void guardarParque() throws FileNotFoundException{
+		PrintWriter escritor = new PrintWriter(new File("./data/parque.txt"));
 		
 //		Lista para las atracciones del parque
 		ArrayList<Atraccion> atracciones = parque.getAtracciones();
@@ -56,9 +60,9 @@ public class PersistenciaAtracciones {
 		escritor.close();
 	}
 	
-	public void leerAtracciones(String archivo) throws IOException, ParseException {
+	public Parque leerParque(String archivo) throws IOException, ParseException {
 	    BufferedReader lector = new BufferedReader(new FileReader(archivo));
-	    Parque parque = new Parque();
+	    Parque parque = this.parque;
 	    String linea;
 
 	    while ((linea = lector.readLine()) != null) {
@@ -126,56 +130,13 @@ public class PersistenciaAtracciones {
 	    }
 
 	    lector.close();
+	    return parque;
 	}
+
+
 	
-    public static void main(String[] args) {
-        try {
-
-        	Parque parque = new Parque();
-
-            ArrayList<Restriccion> restricciones = new ArrayList<>();
-            restricciones.add(new RestriccionEdad(18));
-            restricciones.add(new RestriccionAltura(150));
-
-            Atraccion atraccion = new Mecanica("Montaña Rusa", 100, 5, restricciones, NivelExclusividad.DIAMANTE,
-                                               200, 120, 100, 50, "Ninguna", 3, true);
-            
-            ArrayList<Restriccion> restriccionesCultural = new ArrayList<>();
-            restricciones.add(new RestriccionEdad(10));
-            String fecha = "2025-03-18"; 
-            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-            Date fechaa = formato.parse(fecha);
-
-            
-            Atraccion atraccionCultural = new Cultural(    "Espectáculo canino", 50, 10,restriccionesCultural,NivelExclusividad.FAMILIAR,
-            		"Espectáculo", fechaa, true, true);
-            
-
-
-            parque.agregarAtraccion(atraccion);
-            parque.agregarAtraccion(atraccionCultural);
-            
-
-
-//          Se guarda el archivo
-            PersistenciaAtracciones persistencia = new PersistenciaAtracciones(parque);
-            persistencia.guardarAtracciones();;
-            System.out.println("Atracción guardada correctamente.");
-
-//          Se lee el archivo
-            persistencia.leerAtracciones("./data/atracciones.txt");
-            System.out.println("Atracciones leídas correctamente.");
-
-//          Detallitos
-            System.out.println("\nAtracciones del parque leído:");
-            for (Atraccion a : parque.getAtracciones()) {
-                System.out.println("- " + a.getNombre() + " (" + a.getTipo() + ")");
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error al guardar o leer la atracción: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
+	
 }
+    
+
+

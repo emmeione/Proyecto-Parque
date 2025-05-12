@@ -133,6 +133,10 @@ public class Parque {
     	this.lugares = lugares;
     }
     
+    public void limpiarAtracciones() {
+        this.atracciones.clear();
+    }
+    
 
     
     public class Main {
@@ -191,6 +195,7 @@ public class Parque {
             System.out.println("\nTurnos de Hugo:");
             System.out.println(hugo.revisarTurnos());
         }
+        
     
     }
 

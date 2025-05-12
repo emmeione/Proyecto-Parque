@@ -7,3 +7,4 @@ public interface Restriccion {
     String getDescripcion();
     String serializar();
 }
+

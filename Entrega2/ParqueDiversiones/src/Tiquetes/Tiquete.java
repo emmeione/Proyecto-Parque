@@ -57,7 +57,6 @@ public abstract class Tiquete {
         }
         return "Tiquete no válido para esta atracción";
     }
-    public abstract String serializarTipos();
 
     public abstract String getTipo();
 

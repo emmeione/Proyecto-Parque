@@ -1,16 +1,5 @@
 package Persistencia;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.io.BufferedReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import Administrador.Parque;
-import Usuarios.Cliente;
-import Usuarios.Empleado;
 import Atracciones.Atraccion;
 import Atracciones.Cultural;
 import Atracciones.Mecanica;
@@ -19,23 +8,30 @@ import Restricciones.Restriccion;
 import Restricciones.RestriccionAltura;
 import Restricciones.RestriccionEdad;
 import Roles.Cajero;
-import Roles.Cocinero;
-import Roles.Rol;
 import Tiquetes.Tiquete;
+import Tiquetes.TiqueteBasico;
 import Tiquetes.TiqueteDiamante;
+import Usuarios.Cliente;
+import Usuarios.Empleado;
 
-public class PersistenciaParque {
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+import Administrador.Parque;
+
+public class PersistenciaAtracciones {
 //	Persistencia con archivos de texto
 	private Parque parque;
 	
-	public PersistenciaParque(Parque p) {
+	public PersistenciaAtracciones(Parque p) {
 
 		parque = p;
 	}
 	
-	public void guardarParque() throws FileNotFoundException{
-		PrintWriter escritor = new PrintWriter(new File("./data/parque.txt"));
+	public void guardarAtracciones() throws IOException{
+		PrintWriter escritor = new PrintWriter(new FileWriter("./data/atracciones.txt", true));
 		
 //		Lista para las atracciones del parque
 		ArrayList<Atraccion> atracciones = parque.getAtracciones();
@@ -60,14 +56,26 @@ public class PersistenciaParque {
 		escritor.close();
 	}
 	
-	public Parque leerParque(String archivo) throws IOException, ParseException {
+	public void leerAtracciones(String archivo) throws IOException, ParseException {
 	    BufferedReader lector = new BufferedReader(new FileReader(archivo));
-	    Parque parque = new Parque();
+	    Parque parque = this.parque;
 	    String linea;
+
+//	    Mapa para evitar los duplicados 
+	    HashMap<String, Boolean> existentes = new HashMap<>();
+	    for (Atraccion a : parque.getAtracciones()) {
+	    	existentes.put(a.getNombre().trim().toLowerCase(), true);
+	    }
 
 	    while ((linea = lector.readLine()) != null) {
 	        String[] datos = linea.split(";");
-	        String nombre = datos[0];
+	        String nombre = datos[0].trim().toLowerCase();
+
+//	        Revisar en el mapa si ya existe la atraccion
+	        if (existentes.containsKey(nombre)) {
+	            continue;
+	        }
+
 	        String tipo = datos[1];
 	        String detalles = datos[2];
 	        int cupoEncargados = Integer.parseInt(datos[3]);
@@ -129,14 +137,57 @@ public class PersistenciaParque {
 	        }
 	    }
 
-	    lector.close();
-	    return parque;
-	}
+	    lector.close();}
+	
+    public static void main(String[] args) {
+        try {
+
+        	Parque parque = new Parque();
+
+            ArrayList<Restriccion> restricciones = new ArrayList<>();
+            restricciones.add(new RestriccionEdad(18));
+            restricciones.add(new RestriccionAltura(150));
+
+            Atraccion atraccion = new Mecanica("Montaña Rusa", 100, 5, restricciones, NivelExclusividad.DIAMANTE,
+                                               200, 120, 100, 50, "Ninguna", 3, true);
+            
+            ArrayList<Restriccion> restriccionesCultural = new ArrayList<>();
+            restricciones.add(new RestriccionEdad(10));
+            String fecha = "2025-03-18"; 
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+            Date fechaa = formato.parse(fecha);
+
+            
+            Atraccion atraccionCultural = new Cultural(    "Espectáculo gatuno", 5, 1,restriccionesCultural,NivelExclusividad.FAMILIAR,
+            		"Espectáculo", fechaa, true, true);
+            
 
 
-	
-	
+            parque.agregarAtraccion(atraccion);
+            parque.agregarAtraccion(atraccionCultural);
+            
+
+
+//          Se guarda el archivo
+            PersistenciaAtracciones persistencia = new PersistenciaAtracciones(parque);
+            persistencia.guardarAtracciones();;
+            System.out.println("Atracción guardada correctamente.");
+
+            parque.getAtracciones().clear(); 
+//          Se lee el archivo
+            persistencia.leerAtracciones("./data/atracciones.txt");
+            System.out.println("Atracciones leídas correctamente.");
+
+//          Detallitos
+            System.out.println("\nAtracciones del parque leído:");
+            for (Atraccion a : parque.getAtracciones()) {
+                System.out.println("- " + a.getNombre() + " (" + a.getTipo() + ")");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error al guardar o leer la atracción: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }
-    
-
-

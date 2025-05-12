@@ -21,9 +21,5 @@ public class TiqueteOro extends Tiquete {
                atraccion.getNivelExclusividad() == Atracciones.NivelExclusividad.ORO;
     }
 
-	@Override
-	public String serializarTipos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 }

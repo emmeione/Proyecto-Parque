@@ -16,7 +16,6 @@ import Atracciones.Atraccion;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,11 +32,12 @@ public class PersistenciaLugares {
 //	Persistencia con archivos de texto
 	private Parque parque;
 	
+	
 	public PersistenciaLugares(Parque p) {
 
 		parque = p;}
-	public void guardarLugares() throws FileNotFoundException{
-		PrintWriter escritor = new PrintWriter(new File("./data/lugares.txt"));
+	public void guardarLugares() throws IOException{
+		PrintWriter escritor = new PrintWriter(new FileWriter("./data/lugares.txt", true));
 		ArrayList<Lugar>lugares = parque.getLugares();
 		
 		for (Lugar l: lugares) {
@@ -56,6 +56,7 @@ public class PersistenciaLugares {
 	public void leerLugares()throws IOException {
 		File f = new File("./data/lugares.txt");
 		BufferedReader lector = new BufferedReader(new FileReader(f));
+	    Parque parque = this.parque;
 		String linea = lector.readLine();
 		
 		while(linea != null) {

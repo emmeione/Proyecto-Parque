@@ -38,8 +38,8 @@ public class PersistenciaTiquetes {
 	public PersistenciaTiquetes(Parque p) {
 
 		parque = p;}
-	public void guardarTiquetes() throws FileNotFoundException{
-		PrintWriter escritor = new PrintWriter(new File("./data/tiquetes.txt"));
+	public void guardarTiquetes() throws IOException{
+		PrintWriter escritor = new PrintWriter(new FileWriter("./data/tiquetes.txt", true));
 		ArrayList<Tiquete>tiquetes = parque.getTiquetes();
 		
 		for (Tiquete t: tiquetes) {
@@ -52,9 +52,7 @@ public class PersistenciaTiquetes {
 	        
 			
 	        String fecha = "";
-	        if (tipo.equals("FastPass") && t.serializarTipos() != null) {
-	            fecha = t.serializarTipos();
-	        }
+	
 			
 	        if (tipo.equals("FastPass")) {
 	            escritor.println(codigo + ";" + nombre + ";" + apellido + ";" + precio + ";" + tipo + ";" + fecha);
@@ -69,7 +67,13 @@ public class PersistenciaTiquetes {
 	public void leerTiquetes()throws IOException {
 		File f = new File("./data/tiquetes.txt");
 		BufferedReader lector = new BufferedReader(new FileReader(f));
+	    Parque parque = this.parque;
+
 		String linea = lector.readLine();
+		
+//		Mapa para los duplicados
+		HashMap<String, Boolean> tiquetesExistentes = new HashMap<>();
+
 		
 		while(linea != null) {
 			String[] datos = linea.split(";");
@@ -77,6 +81,13 @@ public class PersistenciaTiquetes {
 			double precio = Double.parseDouble(datos[3]);
 			String comprador = datos[1];
 			String tipo = datos[4];
+			
+	        if (tiquetesExistentes.containsKey(codigo)) {
+	            linea = lector.readLine();
+	            continue;  
+	        }
+	        tiquetesExistentes.put(codigo, true);
+
 			
 			Usuario compradorr = parque.buscarUsuarioPorNombre(comprador);
             if (compradorr == null) {

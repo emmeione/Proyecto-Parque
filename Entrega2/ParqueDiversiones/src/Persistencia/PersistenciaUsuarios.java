@@ -39,8 +39,8 @@ public class PersistenciaUsuarios {
 	public PersistenciaUsuarios(Parque p) {
 
 		parque = p;}
-	public void guardarUsuarios() throws FileNotFoundException{
-		PrintWriter escritor = new PrintWriter(new File("./data/usuarios.txt"));
+	public void guardarUsuarios() throws IOException{
+		PrintWriter escritor = new PrintWriter(new FileWriter("./data/usuarios.txt", true));
 		ArrayList<Cliente>clientes = parque.getClientes();
 		ArrayList<Empleado> empleados = parque.getEmpleados();
 		
@@ -94,6 +94,8 @@ public class PersistenciaUsuarios {
 	public void leerUsuarios() throws IOException {
 	    File f = new File("./data/usuarios.txt");
 	    BufferedReader lector = new BufferedReader(new FileReader(f));
+	    Parque parque = this.parque;
+
 	    String linea = lector.readLine();
 	    
 	    while (linea != null) {
@@ -209,17 +211,17 @@ public class PersistenciaUsuarios {
             parque.agregarEmpleado(operadorMedio);
             parque.agregarEmpleado(general);
 
-            // Guardar usuarios
+//            Guardar a los usuarios
             persistencia.guardarUsuarios();
             System.out.println("Usuarios guardados correctamente.");
 
-            // Crear nuevo parque y cargar los usuarios desde archivo
+//          Crear nuevo parque y cargar los usuarios desde archivo
             Parque parqueLeido = new Parque();
             PersistenciaUsuarios persistenciaLeida = new PersistenciaUsuarios(parqueLeido);
             persistenciaLeida.leerUsuarios();
             System.out.println("Usuarios leídos correctamente.");
 
-            // Imprimir usuarios leídos
+//          Imprimir usuarios leídos
             System.out.println("\nClientes:");
             for (Cliente c : parqueLeido.getClientes()) {
                 System.out.println("- " + c.getNombre() + " " + c.getApellido() + " (" + c.getIdentificacion() + ")");

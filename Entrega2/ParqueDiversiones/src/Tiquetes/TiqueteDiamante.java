@@ -19,9 +19,5 @@ public class TiqueteDiamante extends Tiquete {
         return true;
     }
 
-	@Override
-	public String serializarTipos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }

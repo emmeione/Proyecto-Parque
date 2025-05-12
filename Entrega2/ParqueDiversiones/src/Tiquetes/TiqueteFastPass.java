@@ -32,9 +32,5 @@ public class TiqueteFastPass extends Tiquete {
         return !fechaConsulta.isBefore(fecha);  
     }
 
-	@Override
-	public String serializarTipos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 }

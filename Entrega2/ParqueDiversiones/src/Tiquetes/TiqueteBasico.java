@@ -20,9 +20,5 @@ public class TiqueteBasico extends Tiquete {
         return false; 
     }
 
-	@Override
-	public String serializarTipos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 }

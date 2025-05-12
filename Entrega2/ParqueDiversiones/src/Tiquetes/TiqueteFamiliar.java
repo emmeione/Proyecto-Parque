@@ -20,11 +20,6 @@ public class TiqueteFamiliar extends Tiquete {
         return atraccion.getNivelExclusividad() == Atracciones.NivelExclusividad.FAMILIAR;
     }
 
-	@Override
-	public String serializarTipos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-    
+
     
 }
