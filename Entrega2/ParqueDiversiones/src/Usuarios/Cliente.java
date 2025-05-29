@@ -9,9 +9,9 @@ import Tiquetes.Tiquete;
 public class Cliente extends Usuario {
 
     private int edad;
-    private int estatura;
+    private double estatura;
 
-    public Cliente(String nombre, String apellido, String identificacion, String login, String password, int edad, int estatura) {
+    public Cliente(String nombre, String apellido, String identificacion, String login, String password, int edad, double estatura) {
         super(nombre, apellido, identificacion, login, password);
         this.edad = edad;
         this.estatura = estatura;

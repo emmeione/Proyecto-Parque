@@ -12,6 +12,7 @@ import LugarDeServicio.Taquilla;
 import Roles.Administrador;
 import Roles.Cajero;
 import Roles.Cocinero;
+import Roles.OperadorAtraccion;
 import Roles.ServicioGeneral;
 import Tiquetes.Tiquete;
 import Tiquetes.TiqueteBasico;
@@ -35,7 +36,6 @@ public class Parque {
         this.tiquetes = new ArrayList<>();
         this.usuarios = new HashMap<>();
         this.lugares = new ArrayList<>();
-
     }
 
     public void registrarCliente(Cliente cliente) {
@@ -66,11 +66,9 @@ public class Parque {
             }
         }
     }
-    
-    public void usarTiquete(Tiquete tiquete) {
-//    	Para evitar que haya el fraude 
-        System.out.println("Verificando tiquete: " + tiquete.getCodigo());
 
+    public void usarTiquete(Tiquete tiquete) {
+        System.out.println("Verificando tiquete: " + tiquete.getCodigo());
         if (!tiquete.estaUsado()) {
             tiquete.marcarComoUsado();
             System.out.println("Tiquete válido");
@@ -78,61 +76,95 @@ public class Parque {
             System.out.println("Este tiquete ya fue utilizado. NO VÁLIDO.");
         }
     }
-    
+
     public Lugar buscarLugarPorNombre(String nombre) {
-        for (Empleado empleado : empleados) {
-            for (Lugar lugar : empleado.getLugarDeServicio()) {  
-                if (lugar.getNombre().equalsIgnoreCase(nombre)) {
-                    return lugar;  
-                }
+        for (Lugar lugar : lugares) {
+            if (lugar.getNombre().equalsIgnoreCase(nombre)) {
+                return lugar;
             }
         }
-        return null;  
+        return null;
+    }
+
+    public Empleado buscarEmpleadoPorNombre(String nombre) {
+        for (Empleado empleado : empleados) {
+            if (empleado.getNombre().equalsIgnoreCase(nombre)) {
+                return empleado;
+            }
+        }
+        return null;
+    }
+
+    public Atraccion buscarAtraccionPorNombre(String nombre) {
+        for (Atraccion atraccion : atracciones) {
+            if (atraccion.getNombre().equalsIgnoreCase(nombre)) {
+                return atraccion;
+            }
+        }
+        return null;
     }
 
     public void agregarAtraccion(Atraccion atraccion) {
         atracciones.add(atraccion);
     }
 
-    public void agregarTiquetes(Tiquete tiquetess) {
-    	tiquetes.add(tiquetess);
+    public void agregarTiquetes(Tiquete tiquete) {
+        tiquetes.add(tiquete);
     }
-    
+
     public void agregarCliente(Cliente cliente) {
-    	clientes.add(cliente);
+        clientes.add(cliente);
     }
-    
+
     public void agregarEmpleado(Empleado empleado) {
-    	empleados.add(empleado);
+        empleados.add(empleado);
     }
+
     public void agregarLugar(Lugar lugar) {
-    	lugares.add(lugar);
+        lugares.add(lugar);
     }
+
     public Usuario buscarUsuarioPorNombre(String nombre) {
         return usuarios.get(nombre);
     }
+
     public void registrarTiquete(Tiquete tiquete) {
-        this.tiquetes.add(tiquete);  
+        this.tiquetes.add(tiquete);
         System.out.println("Tiquete registrado: " + tiquete.getCodigo() + " para el cliente " + tiquete.getComprador().getNombre());
+    }
+
+    public void listarAtraccionesYOperadores() {
+        System.out.println("\nAtracciones:");
+        for (Atraccion atr : atracciones) {
+            System.out.println("- " + atr.getNombre() + " (" + atr.getTipo() + ")");
+        }
+
+        System.out.println("\nEmpleados operadores de atracción:");
+        for (Empleado emp : empleados) {
+            if (emp.getRol() instanceof OperadorAtraccion) {
+                System.out.println("- " + emp.getNombre());
+            }
+        }
     }
 
     public ArrayList<Atraccion> getAtracciones() { return atracciones; }
     public ArrayList<Cliente> getClientes() { return clientes; }
     public ArrayList<Empleado> getEmpleados() { return empleados; }
     public ArrayList<Tiquete> getTiquetes() { return tiquetes; }
-    public ArrayList<Lugar> getLugares(){return lugares;}
-    
+    public ArrayList<Lugar> getLugares() { return lugares; }
+
     public void setAtracciones(ArrayList<Atraccion> atracciones) {
-    	this.atracciones = atracciones;
+        this.atracciones = atracciones;
     }
+
     public void setTiquetes(ArrayList<Tiquete> tiquetes) {
-    	this.tiquetes = tiquetes;
-    	
+        this.tiquetes = tiquetes;
     }
+
     public void setLugares(ArrayList<Lugar> lugares) {
-    	this.lugares = lugares;
+        this.lugares = lugares;
     }
-    
+
     public void limpiarAtracciones() {
         this.atracciones.clear();
     }
@@ -144,8 +176,8 @@ public class Parque {
 
             Parque parque = new Parque();
 
-            Lugar cafeteria = new Cafeteria("Cafetería Central", 50);
-            Lugar taquilla = new Taquilla("Taquilla Principal", 10);
+            Lugar cafeteria = new Cafeteria("Cafetería Central", 50, Lugar.ZONA_CENTRAL);
+            Lugar taquilla = new Taquilla("Taquilla Principal", 10, Lugar.ZONA_ESTE);
 
             parque.agregarLugar(cafeteria);
             parque.agregarLugar(taquilla);
@@ -172,14 +204,13 @@ public class Parque {
             parque.agregarEmpleado(hugo);
             parque.agregarEmpleado(marcela);
 
-            marcela.asignarTurnoAEmpleado(armando, "Lunes", "08:00 - 12:00");
-            marcela.asignarTurnoAEmpleado(hugo, "Martes", "09:00 - 15:00");
+
 
             System.out.println("\nActividades en los lugares:");
             cafeteria.realizarActividad();
             taquilla.realizarActividad();
 
-            Cafeteria cafe1 = new Cafeteria("Cafetería central", 8);
+            Cafeteria cafe1 = new Cafeteria("Cafetería central", 8,Lugar.ZONA_NORTE);
             Tiquete tiqueteBasico = new TiqueteBasico("00001", new Empleado("Armando", "Mendoza", "1010084918", "a.mendoza", "brutaslapoliciaaaa",
                     new Cajero(), false, false, false, cafe1), 100000);
             parque.agregarTiquetes(tiqueteBasico);

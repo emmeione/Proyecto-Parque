@@ -1,5 +1,6 @@
 package Usuarios;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import Tiquetes.Tiquete;
@@ -11,9 +12,9 @@ public class Administrador extends Usuario {
     }
 
     public void asignarTurnoEmpleado(Empleado empleado, String dia, String lugarYHorario) {
-        empleado.asignarTurno(dia, lugarYHorario);
+        LocalDate fecha = LocalDate.parse(dia);  
+        empleado.asignarTurno(fecha, lugarYHorario);
     }
-
     public void actualizarRolEmpleado(Empleado empleado, Roles.Rol nuevoRol) {
         empleado.setRol(nuevoRol);
     }

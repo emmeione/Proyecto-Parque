@@ -2,8 +2,8 @@ package LugarDeServicio;
 
 public class Cafeteria extends Lugar{
 
-    public Cafeteria(String nombre, int capacidadMaxima) {
-        super(nombre, "Cafetería", capacidadMaxima);
+    public Cafeteria(String nombre, int capacidadMaxima, int zona) {
+        super(nombre, 1, capacidadMaxima, zona);
     }
 
     @Override

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import Roles.*;
 
@@ -36,85 +37,115 @@ public class PersistenciaLugares {
 	public PersistenciaLugares(Parque p) {
 
 		parque = p;}
-	public void guardarLugares() throws IOException{
-		PrintWriter escritor = new PrintWriter(new FileWriter("./data/lugares.txt", true));
-		ArrayList<Lugar>lugares = parque.getLugares();
-		
-		for (Lugar l: lugares) {
-			
-	        String nombre = l.getNombre();
-	        String tipo = l.getTipo();
-	        int capacidadMaxima = l.getCapacidadMaxima();
-	        
-	            escritor.println(nombre + ";" + tipo + ";" + capacidadMaxima);
-	        
+	public void guardarLugares() throws IOException {
+	    File archivo = new File("./data/lugares.txt");
+	    HashSet<String> nombresZonaGuardados = new HashSet<>();
+
+	    if (archivo.exists()) {
+	        BufferedReader lector = new BufferedReader(new FileReader(archivo));
+	        String linea = lector.readLine();
+	        while (linea != null) {
+	            String[] datos = linea.split(";");
+	            if (datos.length >= 4) {
+	                String nombre = datos[0];
+	                int zona = Integer.parseInt(datos[3]);
+	                nombresZonaGuardados.add(nombre + "_" + zona);
+	            }
+	            linea = lector.readLine();
+	        }
+	        lector.close();
 	    }
 
-		escritor.close();
+	    PrintWriter escritor = new PrintWriter(new FileWriter(archivo, true));
+	    ArrayList<Lugar> lugares = parque.getLugares();
+
+	    for (Lugar l : lugares) {
+	        String nombre = l.getNombre();
+	        int tipo = l.getTipo();
+	        int capacidadMaxima = l.getCapacidadMaxima();
+	        int zona = l.getZona();
+
+	        String clave = nombre + "_" + zona;
+
+	        if (!nombresZonaGuardados.contains(clave)) {
+	            escritor.println(nombre + ";" + tipo + ";" + capacidadMaxima + ";" + zona);
+	            nombresZonaGuardados.add(clave);
+	            System.out.println("Guardado lugar nuevo: " + nombre + " en zona " + Lugar.nombreZona(zona));
+	        }
+	    }
+
+	    escritor.close();
 	}
+
+
 	
-	public void leerLugares()throws IOException {
-		File f = new File("./data/lugares.txt");
-		BufferedReader lector = new BufferedReader(new FileReader(f));
+	public void leerLugares() throws IOException {
+	    File f = new File("./data/lugares.txt");
+	    BufferedReader lector = new BufferedReader(new FileReader(f));
 	    Parque parque = this.parque;
-		String linea = lector.readLine();
-		
-		while(linea != null) {
-			String[] datos = linea.split(";");
-			String nombre = datos [0];
-			String tipo = datos[1];
-			int capacidadMaxima = Integer.parseInt(datos[2]);
-			
+	    parque.getLugares().clear();
 
-			
-			Lugar nuevo = null;
-			tipo = tipo.trim();
+	    String linea = lector.readLine();
 
-			
-			switch(tipo) {
-//			Para los tipos de lugares
-			case"Cafeteria":
-				nuevo = new Cafeteria(nombre,capacidadMaxima);
-				break;
-            case "Tienda":
-                nuevo = new Tienda(nombre,capacidadMaxima);
-                break;
-            case "Taquilla":
-                nuevo = new Taquilla(nombre, capacidadMaxima);
-                break;
+	    while (linea != null) {
+	        String[] datos = linea.split(";");
+	        String nombre = datos[0];
+	        int tipo = Integer.parseInt(datos[1]);
+	        int capacidadMaxima = Integer.parseInt(datos[2]);
+	        int zona = Integer.parseInt(datos[3]);
 
-            default:
-                System.out.println("El lugar " + tipo+" no existe en este parque.");
-                break;				
-			}
-			
+	        Lugar nuevo = null;
+
+	        switch (tipo) {
+	            case 1:
+	                nuevo = new Cafeteria(nombre, capacidadMaxima, zona);
+	                break;
+	            case 3:
+	                nuevo = new Tienda(nombre, capacidadMaxima, zona);
+	                break;
+	            case 2:
+	                nuevo = new Taquilla(nombre, capacidadMaxima, zona);
+	                break;
+	            default:
+	                System.out.println("El lugar " + tipo + " no existe en este parque.");
+	                break;
+	        }
+
 	        if (nuevo != null) {
 	            parque.agregarLugar(nuevo);
-	            System.out.println("Lugar cargado: " + nombre);  
-
+	            System.out.println("Lugar cargado: " + nombre + " en zona " + Lugar.nombreZona(zona));
 	        }
+
 	        linea = lector.readLine();
 	    }
 
 	    lector.close();
-	
-			
 	}
+
 	
 	public static void main(String[] args) throws IOException {
 		
     	Parque parque = new Parque();
 
 		
-        Lugar cafeteriaPrincipal = new Cafeteria("Cafetería Principal", 50);
-        Lugar tienda1 = new Tienda("Tienda de regalos", 30);
-        Lugar taquilla1 = new Taquilla("Taquilla 1", 20);
-        Lugar tienda2 = new Tienda("Tienda de dulces", 25);
+        Lugar cafeteriaPrincipal = new Cafeteria("Cafetería Principal", 50, Lugar.ZONA_CENTRAL);
+        Lugar tienda1 = new Tienda("Tienda de regalos", 30, Lugar.ZONA_ESTE);
+        Lugar taquilla1 = new Taquilla("Taquilla 1", 20, Lugar.ZONA_NORTE);
+        Lugar tienda2 = new Tienda("Tienda de dulces", 25, Lugar.ZONA_SUR);
+        Lugar tienda3 = new Tienda("Tienda de peluches", 25, Lugar.ZONA_SUR);        
+        Lugar tienda4 = new Tienda("Tienda de peluches", 25, Lugar.ZONA_OESTE);
+
+        
+
         
         parque.agregarLugar(cafeteriaPrincipal);
         parque.agregarLugar(tienda1);
         parque.agregarLugar(taquilla1);
         parque.agregarLugar(tienda2);
+        parque.agregarLugar(tienda3);
+        parque.agregarLugar(tienda4);
+
+
 
         Rol cajero = new Cajero();
         Empleado donaCatalina = new Empleado(

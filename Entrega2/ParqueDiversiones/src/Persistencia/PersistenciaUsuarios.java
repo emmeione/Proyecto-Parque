@@ -109,10 +109,10 @@ public class PersistenciaUsuarios {
 	            String login = datos[3];
 	            String password = datos[4];
 	            int edad = Integer.parseInt(datos[5]);
-	            int estatura = Integer.parseInt(datos[6]);
+	            double estatura = Double.parseDouble(datos[6]);
 	            
 	            Cliente cliente = new Cliente(nombre, apellido, identificacion, login, password, edad, estatura);
-	            parque.agregarCliente(cliente);  
+	            parque.registrarCliente(cliente);
 
 	        } else if (datos.length == 11 && datos[9].equals("Empleado")) {
  
@@ -131,9 +131,9 @@ public class PersistenciaUsuarios {
 
 	            int nivelRiesgo = 0;
 
-	            if (Boolean.parseBoolean(datos[6])) { // capAltoRiesgo
+	            if (Boolean.parseBoolean(datos[6])) { 
 	                nivelRiesgo = 2;
-	            } else if (Boolean.parseBoolean(datos[7])) { // capMedioRiesgo
+	            } else if (Boolean.parseBoolean(datos[7])) { 
 	                nivelRiesgo = 1;
 	            } else {
 	                nivelRiesgo = 0;
@@ -145,7 +145,7 @@ public class PersistenciaUsuarios {
 
 	            Empleado empleado = new Empleado(nombre, apellido, identificacion, login, password,
 	                    rol, capAlimentos, capAltoRiesgo, capMedioRiesgo, lugarServicio);
-	            parque.agregarEmpleado(empleado);  
+	            parque.registrarEmpleado(empleado);
 	        }
 
 	        linea = lector.readLine();
@@ -185,11 +185,11 @@ public class PersistenciaUsuarios {
 
 //          Puebras para distintos tipos de empleados
             
-            Taquilla taquilla = new Taquilla("Taquilla 1", 5);
-            Cafeteria cafe1 = new Cafeteria("Caferería central", 8);
-            Tienda tienda1 = new Tienda("",7);
-            Tienda tienda2 = new Tienda("",8);
-            Tienda tienda3 = new Tienda("",9);
+            Taquilla taquilla = new Taquilla("Taquilla 1", 5, Lugar.ZONA_CENTRAL);
+            Cafeteria cafe1 = new Cafeteria("Caferería central", 8, Lugar.ZONA_ESTE);
+            Tienda tienda1 = new Tienda("",7, Lugar.ZONA_OESTE);
+            Tienda tienda2 = new Tienda("",8, Lugar.ZONA_OESTE);
+            Tienda tienda3 = new Tienda("",9, Lugar.ZONA_SUR);
             
             
 
@@ -211,7 +211,7 @@ public class PersistenciaUsuarios {
             parque.agregarEmpleado(operadorMedio);
             parque.agregarEmpleado(general);
 
-//            Guardar a los usuarios
+//          Guardar a los usuarios
             persistencia.guardarUsuarios();
             System.out.println("Usuarios guardados correctamente.");
 

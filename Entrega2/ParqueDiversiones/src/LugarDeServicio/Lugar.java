@@ -5,24 +5,33 @@ import Atracciones.Atraccion;
 
 public abstract class Lugar {
     private String nombre;
-    private String tipo;
+    private int tipo;
     private int capacidadMaxima;
     private boolean estaAbierto;
+    private int zona;
     private ArrayList<Atraccion> atraccionesAsociadas;
+    
+    public static final int ZONA_CENTRAL = 1;
+    public static final int ZONA_NORTE = 2;
+    public static final int ZONA_SUR = 3;
+    public static final int ZONA_ESTE = 4;
+    public static final int ZONA_OESTE = 5;
 
-    public Lugar(String nombre, String tipo, int capacidadMaxima) {
+    public Lugar(String nombre, int tipo, int capacidadMaxima, int zona) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.capacidadMaxima = capacidadMaxima;
         this.estaAbierto = true;
         this.atraccionesAsociadas = new ArrayList<>();
+        this.zona = zona;
+
     }
 
     public String getNombre() {
         return nombre;
     }
 
-    public String getTipo() {
+    public int getTipo() {
         return tipo;
     }
 
@@ -72,4 +81,23 @@ public abstract class Lugar {
     }
 
     public abstract void realizarActividad();
+    public int getZona() {
+        return zona;
+    }
+
+    public void setZona(int zona) {
+        this.zona = zona;
+    }
+    
+//    Esta parte es para que se imprima bonito lo de las zonas
+    public static String nombreZona(int zona) {
+        switch (zona) {
+            case ZONA_CENTRAL: return "Central";
+            case ZONA_NORTE: return "Norte";
+            case ZONA_SUR: return "Sur";
+            case ZONA_ESTE: return "Este";
+            case ZONA_OESTE: return "Oeste";
+            default: return "Desconocida";
+        }
+    }
 }
