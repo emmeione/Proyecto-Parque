@@ -2,6 +2,9 @@ package Tiquetes;
 
 import Usuarios.Cliente;
 import Usuarios.Usuario;
+
+import java.util.ArrayList;
+
 import Atracciones.Atraccion;
 
 public abstract class Tiquete {
@@ -10,6 +13,8 @@ public abstract class Tiquete {
     protected boolean usado;
     protected double precio;
     protected double precioFinal;
+    protected ArrayList<Atraccion> atraccionesIncluidas;
+
 
 //  Método constructor
     public Tiquete(String codigo, Usuario comprador, double precio) {
@@ -26,6 +31,10 @@ public abstract class Tiquete {
 
     public Usuario getComprador() { 
         return comprador;
+    }
+
+    public void setComprador(Usuario comprador) {
+        this.comprador = comprador;
     }
 
     public boolean estaUsado() {

@@ -1,6 +1,6 @@
 package Roles;
 
-public class Administrador implements Rol {
+public class AdministradorR implements Rol {
     @Override
     public String getNombreRol() {
         return "Administrador";

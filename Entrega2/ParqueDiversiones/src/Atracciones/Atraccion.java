@@ -5,6 +5,7 @@ import java.util.List;
 
 import Restricciones.Restriccion;
 import Usuarios.Cliente;
+import Usuarios.Usuario;
 
 public abstract class Atraccion {
 
@@ -13,6 +14,8 @@ public abstract class Atraccion {
     protected int cupoMinimoEncargados;
     protected ArrayList<Restriccion> restricciones;
     protected NivelExclusividad nivelExclusividad;
+    protected int tiquetesVendidos = 0;
+
 
 //    Método constructor
     public Atraccion(String nombre, int cupoMaximoClientes, int cupoMinimoEncargados, ArrayList<Restriccion> restricciones, NivelExclusividad nivelExclusividad) {
@@ -43,13 +46,21 @@ public abstract class Atraccion {
         return nivelExclusividad;
     }
     
-    public boolean clienteCumpleRestricciones(Cliente cliente) {
-        for (Restriccion r : restricciones) {
-            if (!r.cumple(cliente)) {
-                return false; // Si alguna no se cumple, el cliente no puede acceder
+    public int getTiquetesVendidos() {
+        return tiquetesVendidos;
+    }
+
+    public void venderTiquete() {
+        tiquetesVendidos++;
+    }
+    
+    public boolean usuarioCumpleRestricciones(Usuario usuario) {
+        for (Restriccion restriccion : restricciones) {
+            if (!restriccion.cumple(usuario)) {  // Asumiendo que Restricción también fue actualizada
+                return false;
             }
         }
-        return true; // Si todas se cumplen, puede acceder
+        return true;
     }
     
     public ArrayList<String> getRestriccionesNoCumplidas(Cliente cliente) {

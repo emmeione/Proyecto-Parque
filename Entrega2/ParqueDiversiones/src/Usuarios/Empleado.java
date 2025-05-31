@@ -3,7 +3,7 @@ package Usuarios;
 import Roles.Cajero;
 import Roles.Cocinero;
 import Roles.OperadorAtraccion;
-import Roles.Administrador;
+import Roles.AdministradorR;
 
 import Roles.Rol;
 import Roles.ServicioGeneral;
@@ -193,7 +193,7 @@ public class Empleado extends Usuario {
     public static void main(String[] args) {
         // Crear roles
         Rol cajero = new Cajero();
-        Rol administradorRol = new Administrador();
+        Rol administradorRol = new AdministradorR();
         Rol servicioGeneral = new ServicioGeneral();
         Rol cocineroRol = new Cocinero();
         Rol operadorAltoRiesgoRol = new OperadorAtraccion(2); // Nivel de riesgo 2 (alto)
@@ -275,4 +275,9 @@ public class Empleado extends Usuario {
         System.out.println("\nTurnos de Sofía:");
         System.out.println(sofia.revisarTurnos());
     }
+	@Override
+	public double getEstatura() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

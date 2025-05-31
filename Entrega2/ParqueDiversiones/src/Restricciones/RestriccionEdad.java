@@ -1,6 +1,7 @@
 package Restricciones;
 
 import Usuarios.Cliente;
+import Usuarios.Usuario;
 
 public class RestriccionEdad implements Restriccion {
     private int edadMinima;
@@ -10,8 +11,12 @@ public class RestriccionEdad implements Restriccion {
     }
 
     @Override
-    public boolean cumple(Cliente cliente) {
-        return cliente.getEdad() >= edadMinima;
+    public boolean cumple(Usuario usuario) {
+        if (usuario instanceof Cliente) {
+            Cliente cliente = (Cliente) usuario;
+            return cliente.getEdad() >= edadMinima;
+        }
+        return false; // No aplica para otros tipos de usuario
     }
 
 	@Override

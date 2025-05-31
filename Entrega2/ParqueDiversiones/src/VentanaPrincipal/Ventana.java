@@ -194,7 +194,7 @@ public class Ventana extends JFrame {
             Empleado empleado = new Empleado("Nombre", "Apellido", "123456", email, contrasena,
                     new Cajero(), false, false, false, new Taquilla("Taquilla X", 5));
             parque.agregarEmpleado(empleado);
-            persistencia.guardarUsuarios();
+            persistencia.guardarUsuarios("");
 
             JOptionPane.showMessageDialog(this, "Sesión iniciada como empleado.");
             new VentanaEmpleado(empleado);
@@ -210,7 +210,7 @@ public class Ventana extends JFrame {
             Parque parque = new Parque();
             PersistenciaUsuarios persistencia = new PersistenciaUsuarios(parque);
             JOptionPane.showMessageDialog(this, "Sesión iniciada como administrador.");
-            new VentanaAdministrador(parque);
+            new VentanaAdministrador();
 
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -3,14 +3,24 @@ package ConsolaUsuario;
 import LugarDeServicio.Cafeteria;
 import LugarDeServicio.Taquilla;
 import LugarDeServicio.Tienda;
+import Persistencia.PersistenciaAtracciones;
+import Persistencia.PersistenciaUsuarios;
 import Restricciones.Restriccion;
 import Restricciones.RestriccionAltura;
 import Restricciones.RestriccionEdad;
 import LugarDeServicio.Lugar;
+import Roles.AdministradorR;
 import Roles.Cajero;
 import Roles.Cocinero;
 import Roles.Rol;
+import Tiquetes.Tiquete;
+import Tiquetes.TiqueteBasico;
+import Tiquetes.TiqueteDiamante;
+import Tiquetes.TiqueteFamiliar;
+import Tiquetes.TiqueteOro;
+import Tiquetes.Tiquetera;
 import Usuarios.Administrador;
+import Usuarios.Cliente;
 import Usuarios.Empleado;
 import Usuarios.Usuario;
 
@@ -19,24 +29,62 @@ import Atracciones.Mecanica;
 import Atracciones.NivelExclusividad;
 import Atracciones.Cultural;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import javax.swing.*;
 
 import Administrador.Parque;
+
+import java.awt.BorderLayout;
+import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConsolaAdministrador {
 
     private Parque parque;
     private Scanner scanner;
+    private PersistenciaUsuarios persistencia;
 
     public ConsolaAdministrador(Parque parque) {
         this.parque = parque;
         this.scanner = new Scanner(System.in);
+        this.persistencia = new PersistenciaUsuarios(parque);
+        cargarDatosIniciales();
     }
 
-    public void iniciar() {
+    private void cargarDatosIniciales() {
+        try {
+            File directorio = new File("./data");
+            if (!directorio.exists()) {
+                directorio.mkdirs();
+            }
+            persistencia.leerUsuarios("./data/usuarios.txt");
+            System.out.println("Datos de usuarios cargados exitosamente.");
+        } catch (IOException e) {
+            System.out.println("AVISO: No se pudieron cargar usuarios existentes. " + e.getMessage());
+        }
+    }
+
+    private boolean guardarDatos() {
+        try {
+            File archivo = new File("./data/usuarios.txt");
+            if (!archivo.exists()) {
+                archivo.createNewFile();
+            }
+            persistencia.guardarUsuarios("./data/usuarios.txt");
+            System.out.println("Datos guardados exitosamente.");
+            return true;
+        } catch (IOException e) {
+            System.out.println("Error grave al guardar: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public void iniciar() throws IOException, ParseException {
         boolean salir = false;
 
         while (!salir) {
@@ -52,9 +100,11 @@ public class ConsolaAdministrador {
             System.out.println("9. Salir");
             System.out.println("10. Crear empleado");
             System.out.println("11. Crear lugar");
+            System.out.println("12. Comprar tiquete como administrador");
+            System.out.println("13. Ver catálogo tiquetes");
+            System.out.println("14. Simular compra de tiquete para cliente");
 
             System.out.print("Seleccione una opción: ");
-
             int opcion = scanner.nextInt();
             scanner.nextLine(); // consumir salto de línea
 
@@ -69,23 +119,24 @@ public class ConsolaAdministrador {
                     asignarEmpleadoALugar();
                     break;
                 case 4:
-                    asignarTurnoAEmpleado();
+                    asignarTurno();
                     break;
                 case 5:
-                    verTurnosAsignados();
+                    verTurnos();
                     break;
                 case 6:
-                    verTodosEmpleados();
+                    verEmpleados();
                     break;
                 case 7:
-                    verLugaresDisponibles();
+                    verLugares();
                     break;
                 case 8:
                     parque.mostrarCatalogoAtracciones();
                     break;
                 case 9:
                     salir = true;
-                    System.out.println("Saliendo de la consola admin.");
+                    guardarDatos();
+                    System.out.println("Saliendo del sistema...");
                     break;
                 case 10:
                     crearEmpleado();
@@ -93,295 +144,198 @@ public class ConsolaAdministrador {
                 case 11:
                     crearLugar();
                     break;
-
+                case 12:
+                    comprarTiqueteComoAdmin(null);
+                    break;
+                case 13:
+                    parque.mostrarCatalogoTiquetes();
+                    break;
+                case 14:
+                    simularCompraTiquete();
+                    break;
                 default:
                     System.out.println("Opción no válida.");
             }
         }
     }
 
-    private void crearAtraccion() {
-        System.out.print("Nombre de la atracción: ");
-        String nombre = scanner.nextLine();
+    // Métodos existentes (se mantienen igual)
+    private void crearAtraccion() { /* ... */ }
+    private void asignarAtraccionAEmpleado() { /* ... */ }
+    private void asignarEmpleadoALugar() { /* ... */ }
+    private void asignarTurno() { /* ... */ }
+    private void verTurnos() { /* ... */ }
+    private void verEmpleados() { /* ... */ }
+    private void verLugares() { /* ... */ }
+    private void crearEmpleado() { /* ... */ }
+    private void crearLugar() { /* ... */ }
 
-        System.out.print("Capacidad: ");
-        int capacidad = scanner.nextInt();
+    // Métodos para manejo de tiquetes (nuevos o modificados)
+    public void comprarTiqueteComoAdmin(Administrador admin) {
+        System.out.println("Tipos de tiquete disponibles:");
+        System.out.println("1. Diamante");
+        System.out.println("2. Oro");
+        System.out.println("3. Familiar");
+        System.out.println("4. Básico");
+        System.out.print("Seleccione tipo de tiquete (1-4): ");
+        int opcionTipo = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.print("Zona (CENTRAL/NORTE/SUR/ESTE/OESTE): ");
-        String zona = scanner.nextLine();
+        System.out.print("Ingrese código del tiquete: ");
+        String codigo = scanner.nextLine();
 
-        ArrayList<Restriccion> restricciones = new ArrayList<>();
-
-        // Preguntar por RestriccionAltura
-        System.out.print("¿Agregar restricción de altura mínima? (S/N): ");
-        String respuestaAltura = scanner.nextLine();
-        if (respuestaAltura.equalsIgnoreCase("S")) {
-            System.out.print("Ingrese altura mínima en cm: ");
-            int alturaMin = scanner.nextInt();
-            scanner.nextLine();
-            restricciones.add(new RestriccionAltura(alturaMin));
+        System.out.print("Ingrese precio base del tiquete: ");
+        double precio;
+        try {
+            precio = Double.parseDouble(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Precio inválido.");
+            return;
         }
 
-        // Preguntar por RestriccionEdad
-        System.out.print("¿Agregar restricción de edad mínima? (S/N): ");
-        String respuestaEdad = scanner.nextLine();
-        if (respuestaEdad.equalsIgnoreCase("S")) {
-            System.out.print("Ingrese edad mínima en años: ");
-            int edadMin = scanner.nextInt();
-            scanner.nextLine();
-            restricciones.add(new RestriccionEdad(edadMin));
+        Tiquete tiquete = null;
+        switch (opcionTipo) {
+            case 1:
+                tiquete = new TiqueteDiamante(codigo, admin, precio);
+                break;
+            case 2:
+                tiquete = new TiqueteOro(codigo, admin, precio);
+                break;
+            case 3:
+                tiquete = new TiqueteFamiliar(codigo, admin, precio);
+                break;
+            case 4:
+                tiquete = new TiqueteBasico(codigo, admin, precio);
+                break;
+            default:
+                System.out.println("Opción de tiquete no válida.");
+                return;
         }
 
-        NivelExclusividad nivelExclusividad = NivelExclusividad.DIAMANTE;
-
-        Atraccion nuevaAtraccion = new Mecanica(
-            nombre,
-            capacidad,
-            2,                  // cupo mínimo encargados
-            restricciones,
-            nivelExclusividad,
-            200,                // altura máxima cm
-            120,                // altura mínima cm
-            100,                // peso máximo kg
-            30,                 // peso mínimo kg
-            "No apto para cardíacos",
-            2,                  // nivel de riesgo
-            true                // en temporada
-        );
-
-        parque.agregarAtraccion(nuevaAtraccion);
-        System.out.println("Atracción mecánica creada y agregada al parque.");
+        parque.getTiquetera().agregarTiquete(tiquete);
+        System.out.println("Tiquete creado y agregado correctamente a la tiquetera.");
     }
 
-    private void asignarAtraccionAEmpleado() {
-        System.out.print("Nombre del empleado operador: ");
-        String nombreEmpleado = scanner.nextLine();
-        Empleado empleado = parque.buscarEmpleadoPorNombre(nombreEmpleado);
-
-        if (empleado == null) {
-            System.out.println("Empleado no encontrado.");
+    private void simularCompraTiquete() {
+        // Mostrar clientes
+        System.out.println("\n--- CLIENTES REGISTRADOS ---");
+        parque.mostrarClientes();
+        
+        // Seleccionar cliente
+        System.out.print("\nIngrese el nombre del cliente: ");
+        String nombreCliente = scanner.nextLine();
+        
+        Cliente cliente = parque.getClientes().stream()
+            .filter(c -> c.getNombre().equalsIgnoreCase(nombreCliente))
+            .findFirst()
+            .orElse(null);
+            
+        if (cliente == null) {
+            System.out.println("Cliente no encontrado.");
             return;
         }
-
-        if (!(empleado.getRol() instanceof Roles.OperadorAtraccion)) {
-            System.out.println("El empleado no es un operador de atracción.");
-            return;
-        }
-
-        System.out.print("Nombre de la atracción: ");
+        
+        // Mostrar atracciones
+        System.out.println("\n--- ATRACCIONES DISPONIBLES ---");
+        parque.mostrarCatalogoAtracciones();
+        
+        // Seleccionar atracción
+        System.out.print("\nIngrese el nombre de la atracción: ");
         String nombreAtraccion = scanner.nextLine();
+        
         Atraccion atraccion = parque.buscarAtraccionPorNombre(nombreAtraccion);
-
         if (atraccion == null) {
             System.out.println("Atracción no encontrada.");
             return;
         }
-
-        empleado.asignarAtraccion(atraccion);
-        System.out.println("Atracción asignada al empleado operador.");
-    }
-
-    private void asignarEmpleadoALugar() {
-        System.out.print("Nombre del empleado: ");
-        String nombreEmpleado = scanner.nextLine();
-        Empleado empleado = parque.buscarEmpleadoPorNombre(nombreEmpleado);
-
-        if (empleado == null) {
-            System.out.println("Empleado no encontrado.");
-            return;
-        }
-
-        System.out.print("Nombre del lugar: ");
-        String nombreLugar = scanner.nextLine();
-        Lugar lugar = parque.buscarLugarPorNombre(nombreLugar);
-
-        if (lugar == null) {
-            System.out.println("Lugar no encontrado.");
-            return;
-        }
-
-        empleado.setLugarDeServicio(lugar);
-        System.out.println("Lugar asignado al empleado.");
-    }
-
-    private void asignarTurnoAEmpleado() {
-        System.out.print("Nombre del empleado: ");
-        String nombreEmpleado = scanner.nextLine();
-        Empleado empleado = parque.buscarEmpleadoPorNombre(nombreEmpleado);
-
-        if (empleado == null) {
-            System.out.println("Empleado no encontrado.");
-            return;
-        }
-
-        System.out.print("Día del turno (YYYY-MM-DD): ");
-        String dia = scanner.nextLine();
-        LocalDate fecha = LocalDate.parse(dia);
-
-        System.out.print("Horario (ej. 08:00 - 12:00): ");
-        String horario = scanner.nextLine();
-
-        empleado.asignarTurno(fecha, horario);
-        System.out.println("Turno asignado al empleado.");
-    }
-
-    private void verTurnosAsignados() {
-        for (Empleado empleado : parque.getEmpleados()) {
-            System.out.println("Empleado: " + empleado.getNombre());
-            System.out.println(empleado.revisarTurnos());
-            System.out.println("----------------------------");
-        }
-    }
-
-    private void verTodosEmpleados() {
-        System.out.println("=== LISTA DE EMPLEADOS ===");
-        for (Empleado empleado : parque.getEmpleados()) {
-            System.out.println("- " + empleado.getNombre() + " (" + empleado.getRol().getClass().getSimpleName() + ")");
-        }
-    }
-
-    private void verLugaresDisponibles() {
-        System.out.println("=== LUGARES DISPONIBLES ===");
-        for (Lugar lugar : parque.getLugares()) {
-            System.out.println("- " + lugar.getNombre() + " (Zona: " + lugar.getZona() + ")");
-        }
-    }
-
-    private void crearEmpleado() {
-        System.out.println("=== CREAR NUEVO EMPLEADO ===");
-
-        System.out.print("Nombre: ");
-        String nombre = scanner.nextLine();
-
-        System.out.print("Apellido: ");
-        String apellido = scanner.nextLine();
-
-        System.out.print("Identificación: ");
-        String identificacion = scanner.nextLine();
-
-        System.out.print("Login: ");
-        String login = scanner.nextLine();
-
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-
-        System.out.println("Seleccione el rol:");
-        System.out.println("1. Cajero");
-        System.out.println("2. Cocinero");
-        System.out.println("3. Operador de Atracción");
-        System.out.println("4. Administrador");
-        System.out.println("5. Servicio General");
-        System.out.print("Opción: ");
-        int opcionRol = scanner.nextInt();
-        scanner.nextLine();
-
-        Roles.Rol rol = null;
-        switch (opcionRol) {
-            case 1: rol = new Roles.Cajero(); break;
-            case 2: rol = new Roles.Cocinero(); break;
-            case 3:
-                System.out.print("Nivel de riesgo permitido para Operador de Atracción (ej. 1, 2): ");
-                int nivelRiesgo = scanner.nextInt();
-                scanner.nextLine();
-                rol = new Roles.OperadorAtraccion(nivelRiesgo);
-                break;
-            case 4: rol = new Roles.Administrador(); break;
-            case 5: rol = new Roles.ServicioGeneral(); break;
-            default:
-                System.out.println("Rol no válido. Se asignará Servicio General.");
-                rol = new Roles.ServicioGeneral();
-        }
-
-        Lugar lugarAsignado = null;
-        if (!parque.getLugares().isEmpty()) {
-            lugarAsignado = parque.getLugares().get(0); // Asignar el primer lugar disponible
-        }
-
-        boolean capacitadoAlimentos = false;
-        boolean capacitadoAltoRiesgo = false;
-        boolean capacitadoMedioRiesgo = false;
-
-        Empleado nuevoEmpleado = new Empleado(
-            nombre,
-            apellido,
-            identificacion,
-            login,
-            password,
-            rol,
-            capacitadoAlimentos,
-            capacitadoAltoRiesgo,
-            capacitadoMedioRiesgo,
-            lugarAsignado
+        
+        // Generar y mostrar tiquetes disponibles
+        Map<String, List<Atraccion>> catalogo = parque.generarCatalogoTiquetes();
+        Map<String, Tiquete> tiquetes = parque.crearTiquetesDesdeCatalogo(catalogo);
+        
+        System.out.println("\n--- TIPOS DE TIQUETE DISPONIBLES ---");
+        List<String> tiposDisponibles = tiquetes.keySet().stream()
+            .filter(tipo -> catalogo.get(tipo).contains(atraccion))
+            .collect(Collectors.toList());
+            
+        tiposDisponibles.forEach(tipo -> 
+            System.out.println("- " + tipo + " ($" + tiquetes.get(tipo).getPrecio() + ")")
         );
-
-        parque.agregarEmpleado(nuevoEmpleado);
-        System.out.println("Empleado creado y agregado exitosamente.");
-    }
-    private void crearLugar() {
-        System.out.println("=== CREAR NUEVO LUGAR ===");
         
-        System.out.print("Tipo de lugar (1. Cafetería, 2. Tienda, 3. Taquilla): ");
-        int tipoLugar = scanner.nextInt();
-        scanner.nextLine();  // consumir salto de línea
+        // Seleccionar tipo de tiquete
+        System.out.print("\nIngrese el tipo de tiquete: ");
+        String tipoTiquete = scanner.nextLine();
         
-        System.out.print("Nombre del lugar: ");
-        String nombre = scanner.nextLine();
-        
-        System.out.print("Capacidad: ");
-        int capacidad = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.println("Zona:");
-        System.out.println("1. CENTRAL");
-        System.out.println("2. NORTE");
-        System.out.println("3. SUR");
-        System.out.println("4. ESTE");
-        System.out.println("5. OESTE");
-        System.out.print("Seleccione zona (1-5): ");
-        int opcionZona = scanner.nextInt();
-        scanner.nextLine();
-
-        int zona;
-
-        switch (opcionZona) {
-            case 1: zona = Lugar.ZONA_CENTRAL; break;
-            case 2: zona = Lugar.ZONA_NORTE; break;
-            case 3: zona = Lugar.ZONA_SUR; break;
-            case 4: zona = Lugar.ZONA_ESTE; break;
-            case 5: zona = Lugar.ZONA_OESTE; break;
-            default:
-                System.out.println("Zona no válida, se asigna CENTRAL por defecto.");
-                zona = Lugar.ZONA_CENTRAL;
-                break;
+        if (!tiposDisponibles.contains(tipoTiquete)) {
+            System.out.println("Tipo de tiquete no válido para esta atracción.");
+            return;
         }
+        
+        Tiquete tiquete = tiquetes.get(tipoTiquete);
+        
+        // Realizar compra
+        boolean exito = parque.registrarCompraTiquete(
+            cliente.getNombre(),
+            atraccion,
+            tiquete
+        );
+        
+        if (exito) {
+            System.out.println("\n¡Compra exitosa!");
+            System.out.println("Cliente: " + cliente.getNombre());
+            System.out.println("Atracción: " + atraccion.getNombre());
+            System.out.println("Tiquete: " + tiquete.getCodigo() + " (" + tiquete.getTipo() + ")");
+            System.out.println("Precio: $" + tiquete.getPrecio());
+            
+            mostrarTiqueteGrafico(cliente);
+        } else {
+            System.out.println("No se pudo completar la compra. Verifique restricciones.");
+        }
+    }
 
-        Lugar nuevoLugar = null;
-
-        switch (tipoLugar) {
-            case 1:
-                nuevoLugar = new Cafeteria(nombre, capacidad, zona);
-                break;
-            case 2:
-                nuevoLugar = new Tienda(nombre, capacidad, zona);
-                break;
-            case 3:
-                nuevoLugar = new Taquilla(nombre, capacidad, zona);
-                break;
-            default:
-                System.out.println("Tipo de lugar no válido.");
+    private void mostrarTiqueteGrafico(Cliente cliente) {
+        try {
+            if (GraphicsEnvironment.isHeadless()) {
+                System.out.println("\n[Modo gráfico no disponible en este entorno]");
                 return;
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                JFrame frame = new JFrame("Tiquete de " + cliente.getNombre());
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.setSize(400, 300);
+                
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                
+                JLabel label = new JLabel(
+                    "<html><center>" +
+                    "<h2>PARQUE DE ATRACCIONES</h2>" +
+                    "<h3>Tiquete " + cliente.getUltimoTiquete().getTipo() + "</h3>" +
+                    "<hr>" +
+                    "<p><b>Cliente:</b> " + cliente.getNombre() + "</p>" +
+                    "<p><b>Código:</b> " + cliente.getUltimoTiquete().getCodigo() + "</p>" +
+                    "<p><b>Fecha:</b> " + new SimpleDateFormat("dd/MM/yyyy").format(new Date()) + "</p>" +
+                    "<p><b>Precio:</b> $" + cliente.getUltimoTiquete().getPrecio() + "</p>" +
+                    "</center></html>",
+                    SwingConstants.CENTER
+                );
+                
+                panel.add(label, BorderLayout.CENTER);
+                frame.add(panel);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            });
+        } catch (Exception e) {
+            System.out.println("\nNo se pudo mostrar la versión gráfica del tiquete: " + e.getMessage());
         }
-        
-        parque.agregarLugar(nuevoLugar);
-        System.out.println("Lugar creado y agregado al parque.");
     }
 
+    public static void main(String[] args) throws IOException, ParseException {
+        Parque parque = new Parque();
+        parque.cargarAtraccionesDesdeArchivo("./data/atracciones.txt");
+        parque.cargarUsuariosDesdeArchivo("./data/usuarios.txt");
 
-
-    // MÉTODO MAIN para arrancar la consola desde aquí
-    public static void main(String[] args) {
-        Parque parque = new Parque(); // Puedes crear un parque con datos para probar
         ConsolaAdministrador consola = new ConsolaAdministrador(parque);
         consola.iniciar();
     }

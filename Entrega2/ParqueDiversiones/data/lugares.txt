@@ -1,6 +1,0 @@
-Cafetería Principal;1;50;1
-Tienda de regalos;3;30;4
-Taquilla 1;2;20;2
-Tienda de dulces;3;25;3
-Tienda de peluches;3;25;3
-Tienda de peluches;3;25;5

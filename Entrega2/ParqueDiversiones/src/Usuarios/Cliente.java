@@ -3,8 +3,11 @@ package Usuarios;
 import java.util.ArrayList;
 import java.util.List;
 
+import Administrador.Parque;
 import Atracciones.Atraccion;
 import Tiquetes.Tiquete;
+import Tiquetes.TiqueteFamiliar;
+import snippet.TiqueteVentana;
 
 public class Cliente extends Usuario {
 
@@ -39,12 +42,25 @@ public class Cliente extends Usuario {
         return false;
     }
 
-    public void comprarTiquete(Tiquete tiquete, double descuento) {
-        tiquete.aplicarDescuento(descuento);
-        super.comprarTiquete(tiquete, descuento);
-        
-//        De momento mientras se crea la interfaz de usuario
-        System.out.println("Tiquete " + tiquete.getTipo() + " comprado por " + this.getNombre() + " por $" + tiquete.getPrecioFinal());
+    @Override
+    public void comprarTiquete(Tiquete tiquete) {
+        super.comprarTiquete(tiquete);
+        System.out.println("Administrador " + this.getNombre() + " ha comprado un tiquete para: " + 
+                          tiquete.getTipo() + " con precio: " + tiquete.getPrecioFinal());
+    }
+
+    public void comprarTiquete(Tiquete tiquete, double porcentajeDescuento) {
+        double precioConDescuento = tiquete.getPrecio();
+        tiquete.setPrecioFinal(precioConDescuento);
+        super.comprarTiquete(tiquete);
+    }
+    
+    @Override
+    public void comprarTiquete(Tiquete tiquete, Atraccion atraccion, Parque parque) {
+        if (parque.puedeComprarTiquete(this, atraccion)) {
+            super.comprarTiquete(tiquete, atraccion, parque);
+            System.out.println("(Compra administrativa)");
+        }
     }
 
     @Override
@@ -55,4 +71,7 @@ public class Cliente extends Usuario {
     @Override
     public boolean tieneDescuento() {
         return false;     }
+
+    
+    
 }

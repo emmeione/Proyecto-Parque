@@ -2,203 +2,210 @@ package VentanaPrincipal;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class VentanaCliente extends JFrame {
-    CardLayout cardLayout = new CardLayout();
-    JPanel panelContenedor = new JPanel(cardLayout);
 
-    // Paneles
-    JPanel panelInicioSesion;
-    JPanel panelRegistro;
-    JPanel panelMenuCliente;
-    JPanel panelComprarTiquete;
-    JPanel panelVerTiquetes;
-    JPanel panelVerAtracciones;
-    JPanel panelInformacionPersonal;
+    private JPanel panelDerecho;
 
     public VentanaCliente() {
-        setTitle("Parque de Atracciones - Cliente");
-        setSize(500, 400);
-        setLocationRelativeTo(null);
+        setTitle("Usuario - Parque");
+        setSize(800, 450);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-        crearPanelInicioSesion();
-        crearPanelRegistro();
-        crearPanelMenuCliente();
-        crearPanelComprarTiquete();
-        crearPanelVerTiquetes();
-        crearPanelVerAtracciones();
-        crearPanelInformacionPersonal();
+        // Panel izquierdo con botones (fondo rosita)
+        JPanel panelIzquierdo = new JPanel();
+        panelIzquierdo.setBackground(new Color(235, 160, 185)); // mismo rosita que usaste
+        panelIzquierdo.setLayout(new GridLayout(4, 1, 10, 10));
 
-        panelContenedor.add(panelInicioSesion, "InicioSesion");
-        panelContenedor.add(panelRegistro, "Registro");
-        panelContenedor.add(panelMenuCliente, "MenuCliente");
-        panelContenedor.add(panelComprarTiquete, "ComprarTiquete");
-        panelContenedor.add(panelVerTiquetes, "VerTiquetes");
-        panelContenedor.add(panelVerAtracciones, "VerAtracciones");
-        panelContenedor.add(panelInformacionPersonal, "InformacionPersonal");
+        String[] botones = {
+            "Ver Perfil", "Comprar Tiquete", "Ver Atracciones Disponibles", "Cerrar Sesión"
+        };
 
-        add(panelContenedor);
-        cardLayout.show(panelContenedor, "InicioSesion");
+        for (String texto : botones) {
+            JButton boton = new JButton(texto);
+            boton.addActionListener(e -> cambiarPanelDerecho(texto));
+            panelIzquierdo.add(boton);
+        }
+
+        // Panel derecho también con fondo rosita claro
+        panelDerecho = new JPanel();
+        panelDerecho.setBackground(new Color(255, 190, 200)); // mismo rosita claro que usaste
+        panelDerecho.setLayout(new BorderLayout());
+
+        add(panelIzquierdo, BorderLayout.WEST);
+        add(panelDerecho, BorderLayout.CENTER);
+
+        setVisible(true);
     }
 
-    private void crearPanelInicioSesion() {
-        panelInicioSesion = new JPanel(new BorderLayout());
-        JPanel botones = new JPanel();
+    private void cambiarPanelDerecho(String accion) {
+        panelDerecho.removeAll();
 
-        JLabel titulo = new JLabel("Bienvenido al Parque de Atracciones", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-        panelInicioSesion.add(titulo, BorderLayout.NORTH);
+        if ("Ver Perfil".equals(accion)) {
+            mostrarPerfil();
+        } 
+        else if("Comprar Tiquete".equals(accion)) {
+        	mostrarFormularioComprarTiquete();}
+        else if("Cerrar Sesión".equals(accion)) {
+            this.dispose();}
+        
 
-        JButton btnIniciarSesion = new JButton("Iniciar Sesión");
-        JButton btnRegistrarse = new JButton("Registrarse");
-        JButton btnSalir = new JButton("Salir");
-
-        botones.add(btnIniciarSesion);
-        botones.add(btnRegistrarse);
-        botones.add(btnSalir);
-
-        panelInicioSesion.add(botones, BorderLayout.CENTER);
-
-        // Acciones (solo cambio de panel)
-        btnIniciarSesion.addActionListener(e -> cardLayout.show(panelContenedor, "MenuCliente"));
-        btnRegistrarse.addActionListener(e -> cardLayout.show(panelContenedor, "Registro"));
-        btnSalir.addActionListener(e -> System.exit(0));
+            panelDerecho.revalidate();
+            panelDerecho.repaint();
+        
     }
 
-    private void crearPanelRegistro() {
-        panelRegistro = new JPanel(new GridLayout(6, 2, 10, 10));
-        panelRegistro.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+    
+    private void mostrarPerfil() {
+        panelDerecho.removeAll();
+        panelDerecho.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        int fila = 0;
 
-        panelRegistro.add(new JLabel("Nombre:"));
-        panelRegistro.add(new JTextField());
+        // Título
+        gbc.gridx = 0;
+        gbc.gridy = fila++;
+        gbc.gridwidth = 2;
+        JLabel titulo = new JLabel("Perfil del Cliente");
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        panelDerecho.add(titulo, gbc);
 
-        panelRegistro.add(new JLabel("ID:"));
-        panelRegistro.add(new JTextField());
+        // Simulación de cliente, reemplaza con tu objeto real
+        class Cliente {
+            String getNombre() { return "Juan"; }
+            String getApellido() { return "Pérez"; }
+            String getIdentificacion() { return "12345678"; }
+            int getEdad() { return 30; }
+            int getEstatura() { return 175; }
+        }
+        Cliente cliente = new Cliente();
 
-        panelRegistro.add(new JLabel("Email:"));
-        panelRegistro.add(new JTextField());
+        gbc.gridwidth = 1;
 
-        panelRegistro.add(new JLabel("Contraseña:"));
-        panelRegistro.add(new JPasswordField());
+        // Nombre
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Nombre:"), gbc);
 
-        JButton btnRegistrar = new JButton("Registrar");
-        JButton btnVolver = new JButton("Volver");
+        gbc.gridx = 1;
+        JLabel valorNombre = new JLabel(cliente.getNombre());
+        valorNombre.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorNombre, gbc);
+        fila++;
 
-        panelRegistro.add(btnRegistrar);
-        panelRegistro.add(btnVolver);
+        // Apellido
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Apellido:"), gbc);
 
-        btnVolver.addActionListener(e -> cardLayout.show(panelContenedor, "InicioSesion"));
-        btnRegistrar.addActionListener(e -> JOptionPane.showMessageDialog(this, "Registro simulado"));
+        gbc.gridx = 1;
+        JLabel valorApellido = new JLabel(cliente.getApellido());
+        valorApellido.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorApellido, gbc);
+        fila++;
 
+        // Identificación
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Identificación:"), gbc);
+
+        gbc.gridx = 1;
+        JLabel valorIdentificacion = new JLabel(cliente.getIdentificacion());
+        valorIdentificacion.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorIdentificacion, gbc);
+        fila++;
+
+        // Edad
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Edad:"), gbc);
+
+        gbc.gridx = 1;
+        JLabel valorEdad = new JLabel(String.valueOf(cliente.getEdad()));
+        valorEdad.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorEdad, gbc);
+        fila++;
+
+        // Estatura
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Estatura:"), gbc);
+
+        gbc.gridx = 1;
+        JLabel valorEstatura = new JLabel(cliente.getEstatura() + " cm");
+        valorEstatura.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorEstatura, gbc);
+        fila++;
+
+        panelDerecho.revalidate();
+        panelDerecho.repaint();
+    }
+    
+    private void mostrarFormularioComprarTiquete() {
+        panelDerecho.removeAll();
+        panelDerecho.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        int fila = 0;
+
+        // Título
+        gbc.gridx = 0;
+        gbc.gridy = fila++;
+        gbc.gridwidth = 2;
+        JLabel titulo = new JLabel("Comprar Tiquete");
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        panelDerecho.add(titulo, gbc);
+
+        // Etiqueta y ComboBox tipo de tiquete
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Tipo de Tiquete:"), gbc);
+
+        gbc.gridx = 1;
+        JComboBox<String> comboTipos = new JComboBox<>(new String[] {
+            "Básico - acceso general", 
+            "VIP - acceso prioritario y descuentos", 
+            "Premium - todo VIP + ilimitado + souvenirs"
+        });
+        comboTipos.setPreferredSize(new Dimension(250, 25));
+        panelDerecho.add(comboTipos, gbc);
+        fila++;
+
+        // Etiqueta y ComboBox atracciones
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Atracción:"), gbc);
+
+        gbc.gridx = 1;
+        // Simulamos las atracciones disponibles, en tu código usa parque.getAtracciones()
+        JComboBox<String> comboAtracciones = new JComboBox<>(new String[] {
+            "Montaña Rusa", "Casa Embrujada", "Rueda de la Fortuna"
+        });
+        comboAtracciones.setPreferredSize(new Dimension(250, 25));
+        panelDerecho.add(comboAtracciones, gbc);
+        fila++;
+
+        // Botón comprar (aún sin funcionalidad)
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JButton btnComprar = new JButton("Comprar Tiquete");
+        panelDerecho.add(btnComprar, gbc);
+
+        panelDerecho.revalidate();
+        panelDerecho.repaint();
     }
 
-    private void crearPanelMenuCliente() {
-        panelMenuCliente = new JPanel(new GridLayout(6, 1, 10, 10));
-        panelMenuCliente.setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
 
-        JLabel titulo = new JLabel("Menú Cliente", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-        panelMenuCliente.add(titulo);
 
-        JButton btnComprarTiquete = new JButton("Comprar Tiquete");
-        JButton btnVerTiquetes = new JButton("Ver Mis Tiquetes");
-        JButton btnVerAtracciones = new JButton("Ver Atracciones");
-        JButton btnVerInfoPersonal = new JButton("Ver Información Personal");
-        JButton btnCerrarSesion = new JButton("Cerrar Sesión");
-
-        panelMenuCliente.add(btnComprarTiquete);
-        panelMenuCliente.add(btnVerTiquetes);
-        panelMenuCliente.add(btnVerAtracciones);
-        panelMenuCliente.add(btnVerInfoPersonal);
-        panelMenuCliente.add(btnCerrarSesion);
-
-        btnComprarTiquete.addActionListener(e -> cardLayout.show(panelContenedor, "ComprarTiquete"));
-        btnVerTiquetes.addActionListener(e -> cardLayout.show(panelContenedor, "VerTiquetes"));
-        btnVerAtracciones.addActionListener(e -> cardLayout.show(panelContenedor, "VerAtracciones"));
-        btnVerInfoPersonal.addActionListener(e -> cardLayout.show(panelContenedor, "InformacionPersonal"));
-        btnCerrarSesion.addActionListener(e -> cardLayout.show(panelContenedor, "InicioSesion"));
-    }
-
-    private void crearPanelComprarTiquete() {
-        panelComprarTiquete = new JPanel(new GridLayout(4, 1, 10, 10));
-        panelComprarTiquete.setBorder(BorderFactory.createEmptyBorder(20, 150, 20, 150));
-
-        JLabel titulo = new JLabel("Compra de Tiquete", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-        panelComprarTiquete.add(titulo);
-
-        JButton btnRegular = new JButton("Tiquete Regular");
-        JButton btnFastPass = new JButton("FastPass");
-        JButton btnVolver = new JButton("Volver");
-
-        panelComprarTiquete.add(btnRegular);
-        panelComprarTiquete.add(btnFastPass);
-        panelComprarTiquete.add(btnVolver);
-
-        btnVolver.addActionListener(e -> cardLayout.show(panelContenedor, "MenuCliente"));
-        btnRegular.addActionListener(e -> JOptionPane.showMessageDialog(this, "Comprar Tiquete Regular - no implementado"));
-        btnFastPass.addActionListener(e -> JOptionPane.showMessageDialog(this, "Comprar FastPass - no implementado"));
-    }
-
-    private void crearPanelVerTiquetes() {
-        panelVerTiquetes = new JPanel(new BorderLayout());
-        JLabel titulo = new JLabel("Mis Tiquetes", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-
-        JTextArea areaTiquetes = new JTextArea("Listado de tiquetes...\n(Solo visual)");
-        areaTiquetes.setEditable(false);
-
-        JButton btnVolver = new JButton("Volver");
-
-        panelVerTiquetes.add(titulo, BorderLayout.NORTH);
-        panelVerTiquetes.add(new JScrollPane(areaTiquetes), BorderLayout.CENTER);
-        panelVerTiquetes.add(btnVolver, BorderLayout.SOUTH);
-
-        btnVolver.addActionListener(e -> cardLayout.show(panelContenedor, "MenuCliente"));
-    }
-
-    private void crearPanelVerAtracciones() {
-        panelVerAtracciones = new JPanel(new BorderLayout());
-        JLabel titulo = new JLabel("Atracciones Disponibles", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-
-        JTextArea areaAtracciones = new JTextArea("Listado de atracciones...\n(Solo visual)");
-        areaAtracciones.setEditable(false);
-
-        JButton btnVolver = new JButton("Volver");
-
-        panelVerAtracciones.add(titulo, BorderLayout.NORTH);
-        panelVerAtracciones.add(new JScrollPane(areaAtracciones), BorderLayout.CENTER);
-        panelVerAtracciones.add(btnVolver, BorderLayout.SOUTH);
-
-        btnVolver.addActionListener(e -> cardLayout.show(panelContenedor, "MenuCliente"));
-    }
-
-    private void crearPanelInformacionPersonal() {
-        panelInformacionPersonal = new JPanel(new GridLayout(5, 1, 10, 10));
-        panelInformacionPersonal.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 100));
-
-        JLabel titulo = new JLabel("Información Personal", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 16));
-        panelInformacionPersonal.add(titulo);
-
-        panelInformacionPersonal.add(new JLabel("Nombre: (simulado)"));
-        panelInformacionPersonal.add(new JLabel("Usuario: (simulado)"));
-        panelInformacionPersonal.add(new JLabel("Tiquetes activos: (simulado)"));
-
-        JButton btnVolver = new JButton("Volver");
-        panelInformacionPersonal.add(btnVolver);
-
-        btnVolver.addActionListener(e -> cardLayout.show(panelContenedor, "MenuCliente"));
-    }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            VentanaCliente ventana = new VentanaCliente();
-            ventana.setVisible(true);
-        });
+        SwingUtilities.invokeLater(VentanaCliente::new);
     }
 }

@@ -1,10 +1,11 @@
-Beatriz;Pinzón;10308437824;b.pinzon;tandivinoo;25;1.7;Cliente
-Armando;Mendoza;1010084918;a.mendoza;brutaslapoliciaaaa;Cajero;false;false;false;Empleado
-Marcela;Valencia;102934876;ma.valencia;peroyotemerezcoooo;Cocinero;true;false;false;Empleado
-Patricia;Fernandez;13982783;pati.fer;yllegaronlosmeseroooos;Operador de Atracción;false;true;false;Empleado
-Hugo;Lombardi;1288374;hugo.lombardi;llegolamagiallegoelcolorllegolavida;Operador de Atracción;false;false;true;Empleado
-Nicolás;Mora;93812;nico.mora;esaeslafamaquetengoahora;Servicio General;false;false;false;Empleado
-Daniela;Perez;103;danip;dani123;23;170.0;Cliente
-Miguel;Cervantes;134;migcer;mig123;32;123.0;Cliente
-Dario;Gomez;156;dariog;dario123;22;124.0;Cliente
-Mercedes;Garcia;234;mercedesg;merce;44;124.0;Cliente
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces

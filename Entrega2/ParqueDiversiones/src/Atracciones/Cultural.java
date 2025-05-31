@@ -33,7 +33,7 @@ public class Cultural extends Atraccion {
 
     public String getTipoDeCultura() { return tipoDeCultural; }
     public Date getFechaEspectaculo() { return fecha; }
-    public boolean isEsReguladoPorClima() { return esReguladoPorClima; }
+    public boolean esReguladoPorClima() { return esReguladoPorClima; }
     public boolean isEnTemporada() { return enTemporada; }
     public String getDetalles() {
         return fecha + "," + esReguladoPorClima + "," + enTemporada + tipoDeCultural;

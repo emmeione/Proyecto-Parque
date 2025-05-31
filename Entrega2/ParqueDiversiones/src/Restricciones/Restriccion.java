@@ -1,10 +1,12 @@
 package Restricciones;
 
 import Usuarios.Cliente;
+import Usuarios.Usuario;
 
 public interface Restriccion {
-    boolean cumple(Cliente cliente);
+    public abstract boolean cumple(Usuario usuario);
     String getDescripcion();
     String serializar();
+    
 }
 

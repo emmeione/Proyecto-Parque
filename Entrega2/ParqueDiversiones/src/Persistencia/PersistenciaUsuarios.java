@@ -13,6 +13,7 @@ import Roles.Cocinero;
 import Roles.OperadorAtraccion;
 import Roles.Rol;
 import Roles.ServicioGeneral;
+import Roles.AdministradorR;
 import LugarDeServicio.*;
 import Tiquetes.Tiquete;
 import Tiquetes.TiqueteBasico;
@@ -20,6 +21,7 @@ import Tiquetes.TiqueteDiamante;
 import Tiquetes.TiqueteFamiliar;
 import Tiquetes.TiqueteFastPass;
 import Tiquetes.TiqueteOro;
+import Usuarios.Administrador;
 import Usuarios.Cliente;
 import Usuarios.Empleado;
 import Usuarios.Usuario;
@@ -39,13 +41,12 @@ public class PersistenciaUsuarios {
 	public PersistenciaUsuarios(Parque p) {
 
 		parque = p;}
-	public void guardarUsuarios() throws IOException{
-		PrintWriter escritor = new PrintWriter(new FileWriter("./data/usuarios.txt", true));
+	public void guardarUsuarios(String archivo) throws IOException{
+		PrintWriter escritor = new PrintWriter(new FileWriter("./data/usuarios.txt"));
 		ArrayList<Cliente>clientes = parque.getClientes();
 		ArrayList<Empleado> empleados = parque.getEmpleados();
-		
-		
-		
+		ArrayList<Administrador> administradores = parque.getAdministradores();
+			
 //		Esta parte guarda a los clientes
 		for (Cliente c: clientes) {
 			
@@ -60,9 +61,8 @@ public class PersistenciaUsuarios {
 	        
             escritor.println(nombre + ";" + apellido + ";" + identificacion + ";" + login + ";" + password + ";"+edad+";"+estatura+";"+tipo);
 
-
 	    }
-//		Esta parte guarda a los empleados/admin
+//		Esta parte guarda a los empleados
 		for(Empleado e: empleados) {
 			
 			String nombre = e.getNombre();
@@ -82,17 +82,33 @@ public class PersistenciaUsuarios {
 			    escritor.println(nombre + ";" + apellido + ";" + identificacion + ";" + login + ";" + password + ";" +
 			            rol + ";" + capacitadoAlimentos + ";" + capacitadoAltoRiesgo + ";" + capacitadoMedioRiesgo + ";" + tipo + ";" + nombreLugar);
 			}
-
-
 		}
 		
-
+//		Esta parte guarda a los administradores
+		for(Administrador a: administradores) {
+			
+			String nombre = a.getNombre();
+			String apellido = a.getApellido();
+			String identificacion = a.getIdentificacion();
+			String login = a.getLogin();
+			String password = a.getPassword();
+			String rol = a.getRol().getNombreRol();
+			String tipo = a.getTipo();
+			
+			escritor.println(nombre+";"+apellido+";"+identificacion+";"+login+";"+password+";"+rol+";"+tipo);	
+		}
 
 		escritor.close();
 	}
 	
-	public void leerUsuarios() throws IOException {
+	public void leerUsuarios(String archivo) throws IOException {
 	    File f = new File("./data/usuarios.txt");
+	    
+	    if (!f.exists()) {
+	        System.out.println("El archivo de usuarios no existe. Creando uno nuevo...");
+	        f.createNewFile(); 
+	        return; 
+	    }
 	    BufferedReader lector = new BufferedReader(new FileReader(f));
 	    Parque parque = this.parque;
 
@@ -112,7 +128,21 @@ public class PersistenciaUsuarios {
 	            double estatura = Double.parseDouble(datos[6]);
 	            
 	            Cliente cliente = new Cliente(nombre, apellido, identificacion, login, password, edad, estatura);
-	            parque.registrarCliente(cliente);
+	            parque.registrarCliente(cliente);}
+	            
+	            
+	            
+	            else if (datos.length == 7 && datos[6].equals("Administrador")) {
+	                String nombre = datos[0];
+	                String apellido = datos[1];
+	                String identificacion = datos[2];
+	                String login = datos[3];
+	                String password = datos[4];
+	                String nombreRol = datos[5];
+		            Rol rol = crearRol(nombreRol, 0); 
+
+                    Administrador administrador = new Administrador(nombre, apellido, identificacion, login, password, rol);
+	                parque.registrarAdministrador(administrador);
 
 	        } else if (datos.length == 11 && datos[9].equals("Empleado")) {
  
@@ -161,6 +191,8 @@ public class PersistenciaUsuarios {
 	            return new Cajero();
 	        case "Cocinero":
 	            return new Cocinero();
+	        case "Administrador":
+	            return new AdministradorR();
 	        case "Servicio General":
 	            return new ServicioGeneral();
 	        case "Operador de Atracción":
@@ -171,76 +203,63 @@ public class PersistenciaUsuarios {
 	    
 	
 	}
-
-	public static void main(String[] args) {
+    public static void main(String[] args) {
+        // 1. Crear instancia del parque
+        Parque parque = new Parque();
+        
+        // 2. Crear instancia de persistencia
+        PersistenciaUsuarios persistencia = new PersistenciaUsuarios(parque);
+        
+        // 3. Crear administradores de prueba
+        Administrador admin1 = new Administrador(
+            "Maria", 
+            "Garcia", 
+            "ADM001", 
+            "mgarcia", 
+            "admin123", 
+            new AdministradorR()
+        );
+        
+        Administrador admin2 = new Administrador(
+            "Carlos", 
+            "Lopez", 
+            "ADM002", 
+            "clopez", 
+            "secure456", 
+            new AdministradorR()
+        );
+        
+        // 4. Registrar administradores en el parque
+        parque.registrarAdministrador(admin1);
+        parque.registrarAdministrador(admin2);
+        
         try {
-
-//        	Crear el parque
-        	Parque parque = new Parque();
-            PersistenciaUsuarios persistencia = new PersistenciaUsuarios(parque);
-
-//            Prueba del cliente
-            Cliente cliente = new Cliente("Beatriz", "Pinzón", "10308437824", "b.pinzon", "tandivinoo", 25, 170);
-            parque.agregarCliente(cliente);
-
-//          Puebras para distintos tipos de empleados
+            System.out.println("=== ANTES DE GUARDAR ===");
+            parque.mostrarAdministradores();
             
-            Taquilla taquilla = new Taquilla("Taquilla 1", 5, Lugar.ZONA_CENTRAL);
-            Cafeteria cafe1 = new Cafeteria("Caferería central", 8, Lugar.ZONA_ESTE);
-            Tienda tienda1 = new Tienda("",7, Lugar.ZONA_OESTE);
-            Tienda tienda2 = new Tienda("",8, Lugar.ZONA_OESTE);
-            Tienda tienda3 = new Tienda("",9, Lugar.ZONA_SUR);
+            // 5. Guardar los administradores
+            persistencia.guardarUsuarios("./data/usuarios.txt");
+            System.out.println("\nAdministradores guardados en el archivo.");
             
+            // 6. Limpiar la lista para simular nueva sesión
+            parque.getAdministradores().clear();
+            System.out.println("\nLista de administradores limpiada.");
+            parque.mostrarAdministradores();
             
+            // 7. Cargar los datos del archivo
+            persistencia.leerUsuarios("./data/usuarios.txt");
+            System.out.println("\n=== DESPUÉS DE CARGAR ===");
+            parque.mostrarAdministradores();
+            
+            // 8. Verificar integridad de los datos
+            System.out.println("\n=== VERIFICACIÓN ===");
 
-
-            Empleado cajero = new Empleado("Armando", "Mendoza", "1010084918", "a.mendoza", "brutaslapoliciaaaa",
-            	    new Cajero(), false, false, false, taquilla);
-            Empleado cocinero = new Empleado("Marcela", "Valencia", "102934876", "ma.valencia", "peroyotemerezcoooo",
-                    new Cocinero(), true, false, false, cafe1);
-            Empleado operadorAlto = new Empleado("Patricia", "Fernandez", "13982783", "pati.fer", "yllegaronlosmeseroooos",
-                    new OperadorAtraccion(2), false, true, false, tienda1);
-            Empleado operadorMedio = new Empleado("Hugo", "Lombardi", "1288374", "hugo.lombardi", "llegolamagiallegoelcolorllegolavida",
-                    new OperadorAtraccion(1), false, false, true, tienda2);
-            Empleado general = new Empleado("Nicolás", "Mora", "93812", "nico.mora", "esaeslafamaquetengoahora",
-                    new ServicioGeneral(), false, false, false, tienda3);
-
-            parque.agregarEmpleado(cajero);
-            parque.agregarEmpleado(cocinero);
-            parque.agregarEmpleado(operadorAlto);
-            parque.agregarEmpleado(operadorMedio);
-            parque.agregarEmpleado(general);
-
-//          Guardar a los usuarios
-            persistencia.guardarUsuarios();
-            System.out.println("Usuarios guardados correctamente.");
-
-//          Crear nuevo parque y cargar los usuarios desde archivo
-            Parque parqueLeido = new Parque();
-            PersistenciaUsuarios persistenciaLeida = new PersistenciaUsuarios(parqueLeido);
-            persistenciaLeida.leerUsuarios();
-            System.out.println("Usuarios leídos correctamente.");
-
-//          Imprimir usuarios leídos
-            System.out.println("\nClientes:");
-            for (Cliente c : parqueLeido.getClientes()) {
-                System.out.println("- " + c.getNombre() + " " + c.getApellido() + " (" + c.getIdentificacion() + ")");
-            }
-
-            System.out.println("\nEmpleados:");
-            for (Empleado e : parqueLeido.getEmpleados()) {
-                System.out.println("- " + e.getNombre() + " " + e.getApellido() + " - Rol: " + e.getRol().getNombreRol());
-            }
-
-        } catch (Exception e) {
-            System.out.println("Error durante la prueba de persistencia de usuarios: " + e.getMessage());
+            
+        } catch (IOException e) {
+            System.err.println("Error en la persistencia: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
-			
-	
-		
 
 
 }

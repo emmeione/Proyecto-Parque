@@ -22,7 +22,7 @@ public class ConsolaCliente {
 
     public void iniciar() {
         try {
-            persistenciaUsuarios.leerUsuarios();
+            persistenciaUsuarios.leerUsuarios("./data/usuarios");
         } catch (Exception e) {
             System.out.println("No se pudieron cargar los usuarios: " + e.getMessage());
         }
@@ -75,7 +75,7 @@ public class ConsolaCliente {
         Cliente cliente = new Cliente(nombre, apellido, identificacion, login, password, edad, estatura);
         parque.agregarCliente(cliente);
         try {
-            persistenciaUsuarios.guardarUsuarios();
+            persistenciaUsuarios.guardarUsuarios("./data/usuarios");
             System.out.println("Cliente registrado y guardado correctamente.");
         } catch (Exception e) {
             System.out.println("Error al guardar cliente: " + e.getMessage());
