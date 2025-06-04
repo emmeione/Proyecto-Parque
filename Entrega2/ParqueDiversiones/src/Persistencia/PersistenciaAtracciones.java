@@ -153,7 +153,7 @@ public class PersistenciaAtracciones {
 
             if (nueva != null) {
                 parque.agregarAtraccion(nueva);
-                existentes.put(nombreKey, true); // Actualizamos el mapa para no repetir
+                existentes.put(nombreKey, true); 
             }
         }
 

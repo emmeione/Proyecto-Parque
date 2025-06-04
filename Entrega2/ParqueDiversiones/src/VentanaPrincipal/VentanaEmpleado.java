@@ -1,25 +1,43 @@
 package VentanaPrincipal;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+import Administrador.Parque;
+import LugarDeServicio.Lugar;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import Usuarios.Empleado;
+
 import java.awt.*;
 
 public class VentanaEmpleado extends JFrame {
 
     private JPanel panelDerecho;
+    private Empleado empleadoActual;
+    private Parque parque;
 
-    public VentanaEmpleado() {
+    public VentanaEmpleado(Empleado empleado) {
+    	
+    	this.empleadoActual=empleado;
+        this.parque = new Parque();
+
         setTitle("Empleado - Parque");
-        setSize(900, 500);
+        setExtendedState(JFrame.MAXIMIZED_BOTH); 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Panel izquierdo con botones (fondo rosita)
         JPanel panelIzquierdo = new JPanel();
         panelIzquierdo.setBackground(new Color(235, 160, 185));
-        panelIzquierdo.setLayout(new GridLayout(5, 1, 10, 10));
+        panelIzquierdo.setLayout(new GridLayout(4, 1, 10, 10));
 
         String[] botones = {
-            "Crear Empleado", "Asignar a Atracción", "Asignar a Cafetería", "Ver Lista Empleados", "Cerrar Sesión"
+            "Ver Perfil", 
+            "Ver Turnos Asignados", 
+            "Ver Lugares Asignados", 
+            "Comprar Tiquete"
         };
 
         for (String texto : botones) {
@@ -28,7 +46,6 @@ public class VentanaEmpleado extends JFrame {
             panelIzquierdo.add(boton);
         }
 
-        // Panel derecho con fondo rosita claro
         panelDerecho = new JPanel();
         panelDerecho.setBackground(new Color(255, 190, 200));
         panelDerecho.setLayout(new BorderLayout());
@@ -36,7 +53,6 @@ public class VentanaEmpleado extends JFrame {
         add(panelIzquierdo, BorderLayout.WEST);
         add(panelDerecho, BorderLayout.CENTER);
 
-        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -44,140 +60,183 @@ public class VentanaEmpleado extends JFrame {
         panelDerecho.removeAll();
 
         switch (accion) {
-            case "Crear Empleado" -> mostrarFormularioCrearEmpleado();
-            case "Asignar a Atracción" -> mostrarFormularioAsignarAtraccion();
-            case "Asignar a Cafetería" -> mostrarFormularioAsignarCafeteria();
-            case "Ver Lista Empleados" -> mostrarListaEmpleados();
-            case "Cerrar Sesión" -> this.dispose();
+            case "Ver Perfil" -> mostrarPerfil();
+            case "Ver Turnos Asignados" -> mostrarTurnosAsignados();
+            case "Ver Lugares Asignados" -> mostrarLugaresAsignados();
+            case "Comprar Tiquete" -> panelDerecho.add(new PanelCompraTiquetes(parque, empleadoActual));
+            
         }
 
         panelDerecho.revalidate();
         panelDerecho.repaint();
     }
 
-    private void mostrarFormularioCrearEmpleado() {
+    private void mostrarPerfil() {
         panelDerecho.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
         int fila = 0;
 
-        JLabel titulo = new JLabel("Crear Empleado");
+        JLabel titulo = new JLabel("Perfil del Empleado");
         titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
         gbc.gridx = 0; gbc.gridy = fila++; gbc.gridwidth = 2;
         panelDerecho.add(titulo, gbc);
 
         gbc.gridwidth = 1;
 
-        String[] labels = {"Nombre:", "Apellido:", "Identificación:", "Login:", "Password:", "Edad:", "Estatura (cm):"};
-        JTextField[] camposTexto = new JTextField[labels.length];
 
-        for (int i = 0; i < labels.length; i++) {
-            gbc.gridx = 0; gbc.gridy = fila;
-            panelDerecho.add(new JLabel(labels[i]), gbc);
+        gbc.gridx = 0; gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Nombre:"), gbc);
+        gbc.gridx = 1;
+        JLabel valorNombre = new JLabel(empleadoActual.getNombre());
+        valorNombre.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorNombre, gbc);
+        fila++;
 
-            gbc.gridx = 1;
-            camposTexto[i] = new JTextField(20);
-            panelDerecho.add(camposTexto[i], gbc);
-            fila++;
-        }
+        // Apellido
+        gbc.gridx = 0; gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Apellido:"), gbc);
+        gbc.gridx = 1;
+        JLabel valorApellido = new JLabel(empleadoActual.getApellido());
+        valorApellido.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorApellido, gbc);
+        fila++;
 
-        gbc.gridx = 0; gbc.gridy = fila++; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.CENTER;
-        JButton btnCrear = new JButton("Crear");
-        // Aquí puedes añadir el ActionListener para crear el empleado real
-        panelDerecho.add(btnCrear, gbc);
+        // ID Empleado
+        gbc.gridx = 0; gbc.gridy = fila;
+        panelDerecho.add(new JLabel("ID Empleado:"), gbc);
+        gbc.gridx = 1;
+        JLabel valorId = new JLabel(empleadoActual.getIdentificacion());
+        valorId.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorId, gbc);
+        fila++;
+
+        // Rol
+        gbc.gridx = 0; gbc.gridy = fila;
+        panelDerecho.add(new JLabel("Rol:"), gbc);
+        gbc.gridx = 1;
+        JLabel valorRol = new JLabel(empleadoActual.getRol().getNombreRol());
+        valorRol.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        panelDerecho.add(valorRol, gbc);
+        fila++;
+
+
     }
-
-    private void mostrarFormularioAsignarAtraccion() {
-        panelDerecho.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-        int fila = 0;
-
-        JLabel titulo = new JLabel("Asignar Empleado a Atracción");
-        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
-        gbc.gridx = 0; gbc.gridy = fila++; gbc.gridwidth = 2;
-        panelDerecho.add(titulo, gbc);
-
-        gbc.gridwidth = 1;
-
-        // Labels y combos simulados (usa tus listas reales)
-        gbc.gridx = 0; gbc.gridy = fila;
-        panelDerecho.add(new JLabel("Empleado:"), gbc);
-        gbc.gridx = 1;
-        JComboBox<String> comboEmpleados = new JComboBox<>(new String[] {"Empleado1", "Empleado2", "Empleado3"});
-        comboEmpleados.setPreferredSize(new Dimension(250, 25));
-        panelDerecho.add(comboEmpleados, gbc);
-        fila++;
-
-        gbc.gridx = 0; gbc.gridy = fila;
-        panelDerecho.add(new JLabel("Atracción:"), gbc);
-        gbc.gridx = 1;
-        JComboBox<String> comboAtracciones = new JComboBox<>(new String[] {"Montaña Rusa", "Casa Embrujada", "Rueda de la Fortuna"});
-        comboAtracciones.setPreferredSize(new Dimension(250, 25));
-        panelDerecho.add(comboAtracciones, gbc);
-        fila++;
-
-        gbc.gridx = 0; gbc.gridy = fila++; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.CENTER;
-        JButton btnAsignar = new JButton("Asignar");
-        // Aquí puedes añadir el ActionListener para asignar empleado a atracción
-        panelDerecho.add(btnAsignar, gbc);
-    }
-
-    private void mostrarFormularioAsignarCafeteria() {
-        panelDerecho.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-        int fila = 0;
-
-        JLabel titulo = new JLabel("Asignar Empleado a Cafetería");
-        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
-        gbc.gridx = 0; gbc.gridy = fila++; gbc.gridwidth = 2;
-        panelDerecho.add(titulo, gbc);
-
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0; gbc.gridy = fila;
-        panelDerecho.add(new JLabel("Empleado:"), gbc);
-        gbc.gridx = 1;
-        JComboBox<String> comboEmpleados = new JComboBox<>(new String[] {"Empleado1", "Empleado2", "Empleado3"});
-        comboEmpleados.setPreferredSize(new Dimension(250, 25));
-        panelDerecho.add(comboEmpleados, gbc);
-        fila++;
-
-        gbc.gridx = 0; gbc.gridy = fila;
-        panelDerecho.add(new JLabel("Cafetería:"), gbc);
-        gbc.gridx = 1;
-        JComboBox<String> comboCafeterias = new JComboBox<>(new String[] {"Cafetería Central", "Cafetería Sur", "Cafetería Norte"});
-        comboCafeterias.setPreferredSize(new Dimension(250, 25));
-        panelDerecho.add(comboCafeterias, gbc);
-        fila++;
-
-        gbc.gridx = 0; gbc.gridy = fila++; gbc.gridwidth = 2; gbc.anchor = GridBagConstraints.CENTER;
-        JButton btnAsignar = new JButton("Asignar");
-        // Aquí puedes añadir el ActionListener para asignar empleado a cafetería
-        panelDerecho.add(btnAsignar, gbc);
-    }
-
-    private void mostrarListaEmpleados() {
+    private void mostrarTurnosAsignados() {
         panelDerecho.setLayout(new BorderLayout());
 
-        // Simulamos lista, luego conecta con tus datos reales
-        String[] columnas = {"ID", "Nombre", "Apellido", "Rol"};
-        Object[][] datos = {
-            {"1", "Ana", "Gómez", "Atracción"},
-            {"2", "Luis", "Martínez", "Cafetería"},
-            {"3", "Marta", "Rodríguez", "Servicio General"}
+        JLabel titulo = new JLabel("Mis Turnos Asignados");
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titulo.setHorizontalAlignment(JLabel.CENTER);
+        panelDerecho.add(titulo, BorderLayout.NORTH);
+
+        // Columnas de la tabla
+        String[] columnas = {"Fecha", "Hora Inicio", "Hora Fin", "Lugar Asignado"};
+        DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
         };
 
-        JTable tabla = new JTable(datos, columnas);
+        JTable tabla = new JTable(modeloTabla);
+        tabla.setRowHeight(25);
+        
+        String turnos = empleadoActual.revisarTurnos();
+        if (!turnos.isEmpty()) {
+            String[] lineasTurnos = turnos.split("\n");
+            for (String linea : lineasTurnos) {
+                if (linea.contains(":")) {
+                    String[] partes = linea.split(":");
+                    String fecha = partes[0].trim();
+                    String[] horarioLugar = partes.length > 1 ? partes[1].trim().split("-") : new String[0];
+                    
+                    String horaInicio = horarioLugar.length > 0 ? horarioLugar[0].trim() : "";
+                    String horaFin = horarioLugar.length > 1 ? horarioLugar[1].trim() : "";
+                    String lugar = horarioLugar.length > 2 ? horarioLugar[2].trim() : "";
+                    
+                    modeloTabla.addRow(new Object[]{fecha, horaInicio, horaFin, lugar});
+                }
+            }
+        } else {
+            JLabel sinTurnos = new JLabel("No tienes turnos asignados actualmente");
+            sinTurnos.setFont(new Font("SansSerif", Font.PLAIN, 16));
+            sinTurnos.setHorizontalAlignment(JLabel.CENTER);
+            panelDerecho.add(sinTurnos, BorderLayout.CENTER);
+            return;
+        }
+
         JScrollPane scrollPane = new JScrollPane(tabla);
         panelDerecho.add(scrollPane, BorderLayout.CENTER);
+
+        // Botón para actualizar
+        JButton btnActualizar = new JButton("Actualizar Turnos");
+        btnActualizar.addActionListener(e -> mostrarTurnosAsignados()); 
+        
+        JPanel panelBoton = new JPanel();
+        panelBoton.add(btnActualizar);
+        panelDerecho.add(panelBoton, BorderLayout.SOUTH);
+    }
+    private void mostrarLugaresAsignados() {
+        panelDerecho.removeAll();
+        panelDerecho.setLayout(new BorderLayout());
+
+        JLabel titulo = new JLabel("Mis Lugares Asignados");
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titulo.setHorizontalAlignment(JLabel.CENTER);
+        panelDerecho.add(titulo, BorderLayout.NORTH);
+
+        ArrayList<Lugar> lugaresAsignados = empleadoActual.getLugarDeServicio();
+
+        if (lugaresAsignados == null || lugaresAsignados.isEmpty()) {
+            JLabel sinLugares = new JLabel("No tienes lugares asignados actualmente");
+            sinLugares.setFont(new Font("SansSerif", Font.PLAIN, 16));
+            sinLugares.setHorizontalAlignment(JLabel.CENTER);
+            panelDerecho.add(sinLugares, BorderLayout.CENTER);
+        } else {
+            // Crear modelo de tabla
+            String[] columnas = {"Tipo", "Nombre", "Ubicación"};
+            DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            for (Lugar lugar : lugaresAsignados) {
+                String tipo = lugar.getClass().getSimpleName(); 
+                String nombre = lugar.getNombre();
+                int ubicacion = lugar.getZona(); 
+
+                modeloTabla.addRow(new Object[]{
+                    tipo,
+                    nombre,
+                    ubicacion
+                });
+            }
+
+
+            JTable tabla = new JTable(modeloTabla);
+            tabla.setRowHeight(25);
+            tabla.setAutoCreateRowSorter(true);
+
+            JScrollPane scrollPane = new JScrollPane(tabla);
+            panelDerecho.add(scrollPane, BorderLayout.CENTER);
+        }
+
+        // Botón de actualización
+        JButton btnActualizar = new JButton("Actualizar Lugares");
+        btnActualizar.addActionListener(e -> mostrarLugaresAsignados());
+        
+        JPanel panelBoton = new JPanel();
+        panelBoton.add(btnActualizar);
+        panelDerecho.add(panelBoton, BorderLayout.SOUTH);
+
+        panelDerecho.revalidate();
+        panelDerecho.repaint();
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(VentanaEmpleado::new);
-    }
+
+
 }

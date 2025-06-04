@@ -34,22 +34,30 @@ public class Empleado extends Usuario {
     private ArrayList<Lugar> lugares;
 
     public Empleado(String nombre, String apellido, String identificacion, String login, String password,
-                    Rol rol, boolean capacitadoAlimentos, boolean capacitadoAltoRiesgo, boolean capacitadoMedioRiesgo, Lugar lugarServicio) {
-        super(nombre, apellido, identificacion, login, password);
-        this.rol = rol;
-        this.capacitadoAlimentos = capacitadoAlimentos;
-        this.capacitadoAltoRiesgo = capacitadoAltoRiesgo;
-        this.capacitadoMedioRiesgo = capacitadoMedioRiesgo;
-        this.turnosAsignados = new HashMap<>();
-        this.lugares =new ArrayList<>();
-        this.atraccionOperada = null;
-    }
+            Rol rol, boolean capacitadoAlimentos, boolean capacitadoAltoRiesgo, boolean capacitadoMedioRiesgo, Lugar lugarServicio) {
+	    	super(nombre, apellido, identificacion, login, password);
+	    	this.rol = rol;
+	    	this.capacitadoAlimentos = capacitadoAlimentos;
+	    	this.capacitadoAltoRiesgo = capacitadoAltoRiesgo;
+	    	this.capacitadoMedioRiesgo = capacitadoMedioRiesgo;
+	    	this.turnosAsignados = new HashMap<>();
+	    	this.lugares = new ArrayList<>();
+	    	this.atraccionOperada = null;
+	
+	    	if (lugarServicio != null) {
+	    		this.lugares.add(lugarServicio);
+	    	}
+	    }
+
 //      Constructor para operadores de atracción que asigna atracción además de lugar (si quieres)
         public Empleado(String nombre, String apellido, String identificacion, String login, String password,
                         Rol rol, boolean capacitadoAlimentos, boolean capacitadoAltoRiesgo, boolean capacitadoMedioRiesgo, Lugar lugarServicio,
                         Atraccion atraccionOperada) {
             this(nombre, apellido, identificacion, login, password, rol, capacitadoAlimentos, capacitadoAltoRiesgo, capacitadoMedioRiesgo, lugarServicio);
             this.atraccionOperada = atraccionOperada;
+	    	if (lugarServicio != null) {
+	    		this.lugares.add(lugarServicio);
+	    	}
         }
         
         public Atraccion getAtraccionOperada() {
@@ -146,6 +154,9 @@ public class Empleado extends Usuario {
     public String getTipo() {
         return "Empleado";
     }
+    public String getId() {
+    	return identificacion;
+    }
     
     public int cantidadLugares() {
     	return lugares.size();
@@ -196,31 +207,31 @@ public class Empleado extends Usuario {
         Rol administradorRol = new AdministradorR();
         Rol servicioGeneral = new ServicioGeneral();
         Rol cocineroRol = new Cocinero();
-        Rol operadorAltoRiesgoRol = new OperadorAtraccion(2); // Nivel de riesgo 2 (alto)
+        Rol operadorAltoRiesgoRol = new OperadorAtraccion(2); 
 
         // Crear lugares
         Lugar cafeteria = new Cafeteria("Cafetería Principal", 50, Lugar.ZONA_CENTRAL);
         Lugar tienda = new Tienda("Tienda de Regalos", 30, Lugar.ZONA_NORTE);
         Lugar taquilla = new Taquilla("Taquilla Norte", 20, Lugar.ZONA_NORTE);
-        NivelExclusividad nivelExclusividad = NivelExclusividad.DIAMANTE; // o el que corresponda
+        NivelExclusividad nivelExclusividad = NivelExclusividad.DIAMANTE; 
         ArrayList<Restriccion> restricciones = new ArrayList<>();
         restricciones.add(new RestriccionAltura(120));
         restricciones.add(new RestriccionEdad(10));
 
 
         Mecanica montañaRusa = new Mecanica(
-            "Montaña Rusa Extrema",   // nombre
-            40,                      // cupoMaximoClientes
-            2,                       // cupoMinimoEncargados
-            restricciones,            // lista de restricciones
-            nivelExclusividad,        // nivel exclusividad
-            200,                     // limiteMaximoAltura (cm)
-            120,                     // limiteMinimoAltura (cm)
-            100,                     // limiteMaximoPeso (kg)
-            30,                      // limiteMinimoPeso (kg)
-            "No apto para personas con problemas cardíacos",  // contraindicaciones
-            2,                       // nivelDeRiesgo
-            true                     // enTemporada
+            "Montaña Rusa Extrema",   
+            40,                      
+            2,                       
+            restricciones,           
+            nivelExclusividad,       
+            200,                     
+            120,                     
+            100,                     
+            30,                      
+            "No apto para personas con problemas cardíacos",  
+            2,                       
+            true                     
         );
         // Crear empleados
         Empleado catalina = new Empleado("Catalina", "Ángel", "12345", "cataUser", "clave123",

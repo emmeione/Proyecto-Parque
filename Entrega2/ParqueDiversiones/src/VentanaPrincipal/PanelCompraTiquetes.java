@@ -1,36 +1,37 @@
 package VentanaPrincipal;
 
 import javax.swing.*;
-
+import javax.swing.table.DefaultTableModel;
 import Administrador.Parque;
-import Usuarios.Cliente;
-
+import Usuarios.Usuario;
+import Atracciones.Atraccion;
+import GeneradorTiqueteQR.TiqueteVentana;
+import Tiquetes.Tiquete;
+import Tiquetes.TiqueteDiamante;
+import Tiquetes.TiqueteOro;
+import Tiquetes.TiqueteFamiliar;
+import Tiquetes.TiqueteBasico;
+import Restricciones.Restriccion;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Map;
-import Atracciones.Atraccion;
-import Tiquetes.Tiquete;
-import Tiquetes.TiqueteOro;
 
 public class PanelCompraTiquetes extends JPanel {
     private Parque parque;
-    private JPanel panelDerecho;
-    private JComboBox<String> comboClientes;
+    private Usuario comprador;
     private JComboBox<String> comboAtracciones;
     private JComboBox<String> comboTiposTiquete;
     private JLabel lblPrecioFinal;
 
-    public PanelCompraTiquetes(Parque parque) {
+    public PanelCompraTiquetes(Parque parque, Usuario comprador) {
         this.parque = parque;
-        this.panelDerecho = panelDerecho;
+        this.comprador = comprador;
         setLayout(new BorderLayout());
         inicializarComponentes();
     }
 
     private void inicializarComponentes() {
-        // Panel principal con borde y margen
         JPanel panelPrincipal = new JPanel(new GridBagLayout());
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -46,21 +47,16 @@ public class PanelCompraTiquetes extends JPanel {
         titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
         panelPrincipal.add(titulo, gbc);
 
-        // Selector de cliente
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        gbc.gridy = fila;
-        panelPrincipal.add(new JLabel("Cliente:"), gbc);
-
-        gbc.gridx = 1;
-        comboClientes = new JComboBox<>();
-        cargarClientes();
-        panelPrincipal.add(comboClientes, gbc);
-        fila++;
+        // Mostrar nombre del comprador
+        gbc.gridy = fila++;
+        JLabel lblComprador = new JLabel("Comprador: " + comprador.getNombre());
+        lblComprador.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        panelPrincipal.add(lblComprador, gbc);
 
         // Selector de atracción
         gbc.gridx = 0;
         gbc.gridy = fila;
+        gbc.gridwidth = 1;
         panelPrincipal.add(new JLabel("Atracción:"), gbc);
 
         gbc.gridx = 1;
@@ -97,26 +93,60 @@ public class PanelCompraTiquetes extends JPanel {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         JButton btnComprar = new JButton("Comprar Tiquete");
-        btnComprar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                comprarTiquete();
-            }
-        });
+        btnComprar.addActionListener(e -> comprarTiquete());
         panelPrincipal.add(btnComprar, gbc);
+        fila++;
+
+        gbc.gridx = 0;
+        gbc.gridy = fila++;
+        gbc.gridwidth = 2;
+        JButton btnVerTiquetes = new JButton("Ver Mis Tiquetes Comprados");
+        btnVerTiquetes.addActionListener(e -> mostrarTiquetesComprados());
+
+        panelPrincipal.add(btnVerTiquetes, gbc);
 
         add(panelPrincipal, BorderLayout.CENTER);
-
-        // Actualizar precio inicial
         actualizarPrecio();
     }
 
-    private void cargarClientes() {
-        comboClientes.removeAllItems();
-        for (Cliente cliente : parque.getClientes()) {
-            comboClientes.addItem(cliente.getNombre() + " " + cliente.getApellido() + " (" + cliente.getIdentificacion() + ")");
+    private void mostrarTiquetesComprados() {
+    	Window owner = SwingUtilities.getWindowAncestor(this);
+    	JDialog dialog = new JDialog(owner, "Tiquetes de " + comprador.getNombre(), Dialog.ModalityType.APPLICATION_MODAL);
+    	dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setTitle("Tiquetes de " + comprador.getNombre());
+        dialog.setSize(600, 400);
+        dialog.setLayout(new BorderLayout());
+
+        String[] columnas = {"Código", "Tipo", "Precio"};
+        DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
+
+        for (Tiquete t : comprador.getTiquetesAdquiridos()) {
+            modelo.addRow(new Object[] {
+                t.getCodigo(),
+                t.getClass().getSimpleName().replace("Tiquete", ""),
+                
+                String.format("$%.2f", t.getPrecio())
+            });
         }
+
+        if (modelo.getRowCount() == 0) {
+            modelo.addRow(new Object[]{"No has comprado tiquetes", "", ""});
+        }
+
+        JTable tabla = new JTable(modelo);
+        JScrollPane scrollPane = new JScrollPane(tabla);
+
+        JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.addActionListener(e -> dialog.dispose());
+        JPanel panelInferior = new JPanel();
+        panelInferior.add(btnCerrar);
+
+        dialog.add(scrollPane, BorderLayout.CENTER);
+        dialog.add(panelInferior, BorderLayout.SOUTH);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
+
 
     private void cargarAtracciones() {
         comboAtracciones.removeAllItems();
@@ -129,90 +159,76 @@ public class PanelCompraTiquetes extends JPanel {
         String tipoTiquete = (String) comboTiposTiquete.getSelectedItem();
         double precioBase = 0.0;
 
-        // Asignar precio base según el tipo de tiquete
         switch (tipoTiquete) {
-            case "Diamante":
-                precioBase = 100.0;
-                break;
-            case "Oro":
-                precioBase = 70.0;
-                break;
-            case "Familiar":
-                precioBase = 50.0;
-                break;
-            case "Básico":
-                precioBase = 30.0;
-                break;
+            case "Diamante": precioBase = 100.0; break;
+            case "Oro": precioBase = 70.0; break;
+            case "Familiar": precioBase = 50.0; break;
+            case "Básico": precioBase = 30.0; break;
         }
 
-        // Mostrar precio formateado
         lblPrecioFinal.setText(String.format("$%.2f", precioBase));
     }
 
     private void comprarTiquete() {
-        // Obtener selecciones
-        int indiceCliente = comboClientes.getSelectedIndex();
         int indiceAtraccion = comboAtracciones.getSelectedIndex();
         String tipoTiquete = (String) comboTiposTiquete.getSelectedItem();
 
-        // Validar selecciones
-        if (indiceCliente == -1 || indiceAtraccion == -1) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente y una atracción.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (indiceAtraccion < 0) {
+            JOptionPane.showMessageDialog(this, "Seleccione una atracción.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Obtener objetos correspondientes
-        Cliente cliente = parque.getClientes().get(indiceCliente);
         Atraccion atraccion = parque.getAtracciones().get(indiceAtraccion);
 
-        // Verificar restricciones
-        if (!atraccion.usuarioCumpleRestricciones(cliente)) {
-            JOptionPane.showMessageDialog(this, 
-                "El cliente no cumple con las restricciones para esta atracción.", 
-                "Restricción", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        // Verificar cupos disponibles
         if (atraccion.getTiquetesVendidos() >= atraccion.getCupoMaximoClientes()) {
-            JOptionPane.showMessageDialog(this, 
-                "No hay cupos disponibles para esta atracción.", 
-                "Cupo lleno", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No hay cupos disponibles.", "Cupo lleno", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Crear tiquete
-        Tiquete tiquete = new TiqueteOro(generarCodigoTiquete(), cliente, obtenerPrecioTiquete(tipoTiquete));
+        List<String> restriccionesNoCumplidas = obtenerRestriccionesNoCumplidas(comprador, atraccion);
+        if (!restriccionesNoCumplidas.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "Restricciones no cumplidas:\n" + String.join("\n", restriccionesNoCumplidas),
+                "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-        // Registrar compra
-        boolean compraExitosa = parque.registrarCompraTiquete(cliente.getNombre(), atraccion, tiquete);
+        Tiquete tiquete = crearTiquete(tipoTiquete);
+        boolean compraExitosa = parque.registrarCompraTiquete(comprador, atraccion, tiquete);
 
         if (compraExitosa) {
             JOptionPane.showMessageDialog(this, 
-                "Tiquete comprado exitosamente!\n" +
-                "Atracción: " + atraccion.getNombre() + "\n" +
+                "¡Tiquete comprado!\n" + 
                 "Tipo: " + tipoTiquete + "\n" +
                 "Precio: " + lblPrecioFinal.getText(),
-                "Compra Exitosa", JOptionPane.INFORMATION_MESSAGE);
-            
-            // Actualizar listas por si hay cambios en disponibilidad
-            cargarAtracciones();
-            actualizarPrecio();
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            TiqueteVentana.mostrarTiquete(comprador);
         } else {
-            JOptionPane.showMessageDialog(this, 
-                "Error al procesar la compra del tiquete.", 
-                "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al comprar.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private String generarCodigoTiquete() {
-        // Generar un código único para el tiquete
-        return "TQ-" + System.currentTimeMillis();
+    private Tiquete crearTiquete(String tipoTiquete) {
+        
+        String precioTexto = lblPrecioFinal.getText().replace("$", "").replace(",", ".");
+        double precio = Double.parseDouble(precioTexto);
+        String codigo = "TQ-" + System.currentTimeMillis();
+
+        switch (tipoTiquete) {
+            case "Diamante": return new TiqueteDiamante(codigo, comprador, precio);
+            case "Oro": return new TiqueteOro(codigo, comprador, precio);
+            case "Familiar": return new TiqueteFamiliar(codigo, comprador, precio);
+            default: return new TiqueteBasico(codigo, comprador, precio);
+        }
     }
 
-    private double obtenerPrecioTiquete(String tipoTiquete) {
-        // Obtener el precio numérico del texto mostrado (que ya incluye descuentos si los hubiera)
-        String precioTexto = lblPrecioFinal.getText().replace("$", "");
-        return Double.parseDouble(precioTexto);
+    private List<String> obtenerRestriccionesNoCumplidas(Usuario usuario, Atraccion atraccion) {
+        List<String> restricciones = new java.util.ArrayList<>();
+        for (Restriccion restriccion : atraccion.getRestricciones()) {
+            if (!restriccion.cumple(usuario)) {
+                restricciones.add(restriccion.getDescripcion());
+            }
+        }
+        return restricciones;
     }
 }

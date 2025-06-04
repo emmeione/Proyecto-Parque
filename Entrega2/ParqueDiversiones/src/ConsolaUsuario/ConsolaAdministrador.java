@@ -275,7 +275,7 @@ public class ConsolaAdministrador {
         
         // Realizar compra
         boolean exito = parque.registrarCompraTiquete(
-            cliente.getNombre(),
+            cliente,
             atraccion,
             tiquete
         );

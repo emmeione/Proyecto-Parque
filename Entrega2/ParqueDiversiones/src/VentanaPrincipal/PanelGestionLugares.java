@@ -105,26 +105,21 @@ public class PanelGestionLugares extends JPanel {
         // Acción del botón Guardar
         btnGuardar.addActionListener(e -> {
             try {
-                // Validar y obtener datos
                 String tipo = (String) comboTipo.getSelectedItem();
                 String nombre = campoNombre.getText().trim();
                 int capacidad = Integer.parseInt(campoCapacidad.getText().trim());
                 int zona = convertirZonaACodigo((String) comboZona.getSelectedItem());
 
-                // Crear lugar según el tipo
                 Lugar nuevoLugar = crearLugarPorTipo(tipo, nombre, capacidad, zona);
                 if (nuevoLugar == null) {
                     mostrarError("Tipo de lugar no válido");
                     return;
                 }
 
-                // Guardar en el sistema
                 guardarLugar(nuevoLugar);
                 
-                // Limpiar campos
                 limpiarCampos(campoNombre, campoCapacidad);
                 
-                // Mostrar éxito
                 mostrarExito("Lugar creado exitosamente!");
 
             } catch (NumberFormatException ex) {
@@ -172,7 +167,6 @@ public class PanelGestionLugares extends JPanel {
     private JPanel crearPanelVerLugares() {
         JPanel panel = new JPanel(new BorderLayout());
         
-        // Modelo de tabla
         String[] columnas = {"Nombre", "Tipo", "Capacidad", "Zona", "Ocupación"};
         DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
             @Override

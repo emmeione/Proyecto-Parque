@@ -17,9 +17,13 @@ import java.io.IOException;
 
 public class PanelGestionEmpleados extends JPanel {
     private Parque parque;
+    private PersistenciaUsuarios persistencia;
+    private String rutaArchivoUsuarios;
     
-    public PanelGestionEmpleados(Parque parque) {
+    public PanelGestionEmpleados(Parque parque, PersistenciaUsuarios persistencia, String rutaArchivoUsuarios) {
         this.parque = parque;
+        this.persistencia = persistencia;
+        this.rutaArchivoUsuarios = rutaArchivoUsuarios;
         initComponents();
     }
     
@@ -220,25 +224,29 @@ public class PanelGestionEmpleados extends JPanel {
     }
     
     private void crearYGuardarEmpleado(
-        String nombre, String apellido, String identificacion, 
-        String login, String password, Rol rol,
-        boolean capacitadoAlimentos, boolean capacitadoAltoRiesgo,
-        boolean capacitadoMedioRiesgo, Lugar lugarAsignado
-    ) throws IOException {
-        Empleado nuevoEmpleado = new Empleado(
-            nombre, apellido, identificacion, login, password,
-            rol, capacitadoAlimentos, capacitadoAltoRiesgo,
-            capacitadoMedioRiesgo, lugarAsignado
-        );
+    	    String nombre, String apellido, String identificacion, 
+    	    String login, String password, Rol rol,
+    	    boolean capacitadoAlimentos, boolean capacitadoAltoRiesgo,
+    	    boolean capacitadoMedioRiesgo, Lugar lugarAsignado
+    	) {
+    	    Empleado nuevoEmpleado = new Empleado(
+    	        nombre, apellido, identificacion, login, password,
+    	        rol, capacitadoAlimentos, capacitadoAltoRiesgo,
+    	        capacitadoMedioRiesgo, lugarAsignado
+    	    );
 
-        parque.agregarEmpleado(nuevoEmpleado);
-        parque.registrarEmpleado(nuevoEmpleado);
-        
-        PersistenciaUsuarios persistencia = new PersistenciaUsuarios(parque);
-        persistencia.guardarUsuarios("./data/usuarios.txt");
-        
-        mostrarExito("Empleado creado y guardado exitosamente.");
-    }
+    	    parque.registrarEmpleado(nuevoEmpleado);
+
+    	    try {
+    	        persistencia.guardarUsuarios(rutaArchivoUsuarios);
+    	        mostrarExito("Empleado creado y guardado exitosamente.");
+    	    } catch (IOException e) {
+    	        mostrarError("Error al guardar el archivo de usuarios: " + e.getMessage());
+    	    }
+    	}
+    
+    
+
     
     private void limpiarCampos(
         JTextField nombre, JTextField apellido, JTextField identificacion,

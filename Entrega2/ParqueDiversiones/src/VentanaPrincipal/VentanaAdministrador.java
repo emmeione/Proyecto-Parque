@@ -47,13 +47,22 @@ public class VentanaAdministrador extends JFrame {
 
     private JPanel panelDerecho;
     private Parque parque;
+    private PersistenciaUsuarios persistencia;
+    private final String archivoUsuarios = "./data/usuarios.txt";
+    private Administrador administradorActual;
 
 
-    public VentanaAdministrador() {
+
+
+    public VentanaAdministrador(Administrador admin) {
         this.parque = new Parque();
+        this.administradorActual = admin;
+
         try {
             parque.cargarAtraccionesDesdeArchivo("./data/atracciones.txt");
             parque.cargarUsuariosDesdeArchivo("./data/usuarios.txt");
+            this.persistencia = new PersistenciaUsuarios(parque);
+
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, 
                 "Error al cargar datos iniciales: " + e.getMessage(), 
@@ -62,11 +71,10 @@ public class VentanaAdministrador extends JFrame {
 
 
         setTitle("Administrador Parque");
-        setSize(800, 450);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Panel izquierdo con botones
         JPanel panelIzquierdo = new JPanel();
         panelIzquierdo.setBackground(new Color(235, 160, 185));
         panelIzquierdo.setLayout(new GridLayout(7, 1, 10, 10));
@@ -82,7 +90,6 @@ public class VentanaAdministrador extends JFrame {
             panelIzquierdo.add(boton);
         }
 
-        // Panel derecho inicial vacío
         panelDerecho = new JPanel();
         panelDerecho.setBackground(new Color(255, 190, 200));
         panelDerecho.setLayout(new FlowLayout());
@@ -100,7 +107,7 @@ public class VentanaAdministrador extends JFrame {
         }
         
         else if (accion.equals("Crear empleado")) {
-            panelDerecho.add(new PanelGestionEmpleados(parque));
+            panelDerecho.add(new PanelGestionEmpleados(parque, persistencia, archivoUsuarios));
         }
         
         else if (accion.equals("Crear lugar")) {
@@ -116,7 +123,7 @@ public class VentanaAdministrador extends JFrame {
         }
         
         else if(accion.equals("Comprar tiquete")) {
-        	panelDerecho.add(new PanelCompraTiquetes(parque));
+        	panelDerecho.add(new PanelCompraTiquetes(parque, administradorActual));
         }
         else if(accion.equals("Asignar turno")) {
         	panelDerecho.add( new PanelGestionTurnos(parque));
@@ -175,7 +182,6 @@ public class VentanaAdministrador extends JFrame {
         panelDerecho.add(campoPrecio, gbc);
         fila++;
 
-        // Botón Crear
         gbc.gridx = 0;
         gbc.gridy = fila;
         gbc.gridwidth = 2;
@@ -183,7 +189,6 @@ public class VentanaAdministrador extends JFrame {
         JButton btnCrear = new JButton("Crear Tiquete");
         panelDerecho.add(btnCrear, gbc);
 
-        // Acción botón (solo visual, sin la lógica de creación todavía)
         btnCrear.addActionListener(e -> {
             String tipoSeleccionado = (String) comboTipos.getSelectedItem();
             String codigo = campoCodigo.getText().trim();
@@ -202,7 +207,6 @@ public class VentanaAdministrador extends JFrame {
                 return;
             }
 
-            // Aquí iría la creación real del tiquete usando 'tipoSeleccionado', 'codigo', 'precio'
 
             JOptionPane.showMessageDialog(panelDerecho, "Tiquete de tipo " + tipoSeleccionado + " creado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         });
@@ -211,9 +215,7 @@ public class VentanaAdministrador extends JFrame {
         panelDerecho.repaint();
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(VentanaAdministrador::new);
-    }
+
 
 }
 

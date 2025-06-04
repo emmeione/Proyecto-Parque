@@ -1,11 +1,20 @@
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
-Pepito;Perez;111;pepe;123;Operador de Atracción;false;true;true;Empleado;Tienda de dulces
+Roberto;Pérez;CLI999;rperez;cliente789;28;1.8;CLIENTE
+Sofía;López;ADM999;slopez;adminpass;Administrador;ADMIN
+Roberto;Pérez;CLI999;rperez;cliente789;28;1.8;CLIENTE
+Sofía;López;ADM999;slopez;adminpass;Administrador;ADMIN
+Roberto;Pérez;CLI999;rperez;cliente789;28;1.8;CLIENTE
+Sofía;López;ADM999;slopez;adminpass;Administrador;ADMIN
+Michelle;Casallas;123;ma.casallas;michi;18;170.0;CLIENTE
+Roberto;Pérez;CLI999;rperez;cliente789;28;1.8;CLIENTE
+Michelle;Casallas;123;ma.casallas;michi;18;170.0;CLIENTE
+Laura;Mejía;EMP999;lmejia;pass123;Cocinero;true;false;false;Cafetería Central;EMPLEADO
+Sofía;López;ADM999;slopez;adminpass;Administrador;ADMIN
+Roberto;Pérez;CLI999;rperez;cliente789;28;1.8;CLIENTE
+Michelle;Casallas;123;ma.casallas;michi;18;170.0;CLIENTE
+Sofía;López;ADM999;slopez;adminpass;Administrador;ADMIN
+Roberto;Pérez;CLI999;rperez;cliente789;28;1.8;CLIENTE
+Michelle;Casallas;123;ma.casallas;michi;18;170.0;CLIENTE
+Sofía;López;ADM999;slopez;adminpass;Administrador;ADMIN
+Roberto;Pérez;CLI999;rperez;cliente789;28;1.8;CLIENTE
+Michelle;Casallas;123;ma.casallas;michi;18;170.0;CLIENTE
+Sofía;López;ADM999;slopez;adminpass;Administrador;ADMIN

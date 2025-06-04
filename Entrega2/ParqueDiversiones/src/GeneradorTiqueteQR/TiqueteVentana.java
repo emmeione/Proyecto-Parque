@@ -1,4 +1,4 @@
-package snippet;
+package GeneradorTiqueteQR;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -32,13 +32,11 @@ public class TiqueteVentana extends JPanel {
     private BufferedImage qrImage;
     private BufferedImage parqueImage;
     private BufferedImage tipoImage;
-    private Cliente cliente;
+    private Usuario cliente;
     private Tiquete tiquete;
-    
-    
 
-    public TiqueteVentana(Cliente usuario) {
-        this.cliente = cliente;
+    public TiqueteVentana(Usuario usuario) {
+        this.cliente = usuario;
         this.tiquete = cliente.getUltimoTiquete();
 
         // Generar QR con info real
@@ -69,7 +67,7 @@ public class TiqueteVentana extends JPanel {
     }
 
     private BufferedImage crearQR(String texto) {
-        int size = 150; // tamaño más pequeño del QR
+        int size = 150; 
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
         Map<EncodeHintType, Object> hints = new HashMap<>();
@@ -184,7 +182,7 @@ public class TiqueteVentana extends JPanel {
         }
     }
 
-    public static void mostrarTiquete(Cliente cliente) {
+    public static void mostrarTiquete(Usuario cliente) {
         JFrame frame = new JFrame("Imprimir boleta");
         TiqueteVentana panel = new TiqueteVentana(cliente);
 

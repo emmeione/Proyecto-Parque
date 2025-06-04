@@ -4,6 +4,7 @@ import Usuarios.Cliente;
 import Usuarios.Usuario;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import Atracciones.Atraccion;
 
@@ -14,6 +15,8 @@ public abstract class Tiquete {
     protected double precio;
     protected double precioFinal;
     protected ArrayList<Atraccion> atraccionesIncluidas;
+    private Date fechaCompra;
+    private String estado;
 
 
 //  Método constructor
@@ -23,6 +26,8 @@ public abstract class Tiquete {
         this.usado = false;
         this.precio = precio;
         this.precioFinal = precio;
+        this.fechaCompra = new Date();
+        this.estado = "Activo";
     }
 
     public String getCodigo() {

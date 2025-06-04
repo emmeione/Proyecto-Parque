@@ -2,9 +2,11 @@ package VentanaPrincipal;
 
 import javax.swing.*;
 import Administrador.Parque;
+import LugarDeServicio.Lugar;
 import LugarDeServicio.Taquilla;
 import Persistencia.PersistenciaUsuarios;
 import Roles.Cajero;
+import Usuarios.Administrador;
 import Usuarios.Cliente;
 import Usuarios.Empleado;
 
@@ -38,7 +40,7 @@ public class Ventana extends JFrame {
         panelImagen.add(labelImagen);
 
         // Campos de texto (atributos de clase, no locales)
-        JLabel lblEmail = new JLabel("Email:");
+        JLabel lblEmail = new JLabel("login:");
         lblEmail.setFont(new Font("Arial", Font.BOLD, 30));
         lblEmail.setForeground(Color.WHITE);
         txtEmail = new JTextField(20);
@@ -103,6 +105,8 @@ public class Ventana extends JFrame {
 
         // Botón Registrarse
         btnRegistrarse = new JButton("Registrarse");
+        btnRegistrarse.addActionListener(e -> registrarCliente());
+
         btnRegistrarse.setFont(new Font("Arial", Font.BOLD, 28));
         btnRegistrarse.setForeground(Color.BLACK);
         btnRegistrarse.setBackground(Color.WHITE);
@@ -135,7 +139,6 @@ public class Ventana extends JFrame {
         rdbAdministrador.addActionListener(listener);
         rdbEmpleado.addActionListener(listener);
 
-        // Inicialmente ocultos
         btnIniciarSesion.setVisible(false);
         btnRegistrarse.setVisible(false);
 
@@ -170,47 +173,87 @@ public class Ventana extends JFrame {
         }
     }
 
-    private void iniciarComoCliente(String email, String contrasena) {
+    private void iniciarComoCliente(String login, String contrasena) {
         try {
             Parque parque = new Parque();
             PersistenciaUsuarios persistencia = new PersistenciaUsuarios(parque);
-            Cliente cliente = new Cliente("Beatriz", "Pinzón", "10308437824", email, contrasena, 25, 170);
-            parque.agregarCliente(cliente);
-            persistencia.guardarUsuarios();
+            persistencia.leerUsuarios("./data/usuarios.txt");
+            
+            Cliente cliente = parque.getClientes().stream()
+                .filter(a -> a.getLogin().equals(login) && a.getPassword().equals(contrasena))
+                .findFirst()
+                .orElse(null);
 
-            JOptionPane.showMessageDialog(this, "Sesión iniciada como cliente.");
-            new VentanaCliente(cliente);
+            if (cliente != null) {
+                JOptionPane.showMessageDialog(this, "Sesión iniciada como cliente.");
+                new VentanaCliente(cliente); 
+                this.dispose();  
+            } else {
+                JOptionPane.showMessageDialog(this, "Credenciales inválidas para administrador.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
 
+            
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error iniciando como cliente: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error iniciando sesión: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void iniciarComoEmpleado(String email, String contrasena) {
+
+    private void iniciarComoEmpleado(String login, String contrasena) {
         try {
             Parque parque = new Parque();
             PersistenciaUsuarios persistencia = new PersistenciaUsuarios(parque);
-            Empleado empleado = new Empleado("Nombre", "Apellido", "123456", email, contrasena,
-                    new Cajero(), false, false, false, new Taquilla("Taquilla X", 5));
-            parque.agregarEmpleado(empleado);
-            persistencia.guardarUsuarios("");
+            persistencia.leerUsuarios("./data/usuarios.txt");
+            
+            Empleado empleado = parque.getEmpleados().stream()
+                    .filter(a -> a.getLogin().equals(login) && a.getPassword().equals(contrasena))
+                    .findFirst()
+                    .orElse(null);
 
-            JOptionPane.showMessageDialog(this, "Sesión iniciada como empleado.");
-            new VentanaEmpleado(empleado);
+                if (empleado != null) {
+                    JOptionPane.showMessageDialog(this, "Sesión iniciada como empleado.");
+                    new VentanaEmpleado(empleado); 
+                    this.dispose();  
+                } else {
+                    JOptionPane.showMessageDialog(this, "Credenciales inválidas para administrador.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            
+            System.out.println("Empleados cargados:");
+            for (Empleado e : parque.getEmpleados()) {
+                System.out.println(e.getLogin() + " / " + e.getPassword());
+            }
+
+
+
 
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error iniciando como empleado: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        
     }
 
-    private void iniciarComoAdministrador(String email, String contrasena) {
+
+    private void iniciarComoAdministrador(String login, String contrasena) {
         try {
             Parque parque = new Parque();
             PersistenciaUsuarios persistencia = new PersistenciaUsuarios(parque);
-            JOptionPane.showMessageDialog(this, "Sesión iniciada como administrador.");
-            new VentanaAdministrador();
+            persistencia.leerUsuarios("./data/usuarios.txt");
+
+            Administrador admin = parque.getAdministradores().stream()
+                .filter(a -> a.getLogin().equals(login) && a.getPassword().equals(contrasena))
+                .findFirst()
+                .orElse(null);
+
+            if (admin != null) {
+                JOptionPane.showMessageDialog(this, "Sesión iniciada como administrador.");
+                new VentanaAdministrador(admin); 
+                this.dispose();  
+            } else {
+                JOptionPane.showMessageDialog(this, "Credenciales inválidas para administrador.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -218,7 +261,16 @@ public class Ventana extends JFrame {
         }
     }
 
+
+
     public static void main(String[] args) {
         new Ventana();
+    }
+    private void registrarCliente() {
+        if (rdbCliente.isSelected()) {
+            new VentanaRegistroCliente(this);
+        } else {
+            JOptionPane.showMessageDialog(this, "El registro solo está disponible para clientes.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

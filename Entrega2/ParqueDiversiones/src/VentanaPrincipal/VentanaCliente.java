@@ -2,20 +2,30 @@ package VentanaPrincipal;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+
+import Administrador.Parque;
+import Usuarios.Cliente;
 
 public class VentanaCliente extends JFrame {
 
     private JPanel panelDerecho;
+    private Parque parque;
+    private Cliente clienteActual;
 
-    public VentanaCliente() {
+    public VentanaCliente(Cliente cliente) {
+        this.clienteActual = cliente;
+        this.parque = new Parque();
+
+        parque.cargarAtraccionesDesdeArchivo("./data/atracciones.txt");
+
         setTitle("Usuario - Parque");
-        setSize(800, 450);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Panel izquierdo con botones (fondo rosita)
         JPanel panelIzquierdo = new JPanel();
-        panelIzquierdo.setBackground(new Color(235, 160, 185)); // mismo rosita que usaste
+        panelIzquierdo.setBackground(new Color(235, 160, 185));
         panelIzquierdo.setLayout(new GridLayout(4, 1, 10, 10));
 
         String[] botones = {
@@ -28,9 +38,8 @@ public class VentanaCliente extends JFrame {
             panelIzquierdo.add(boton);
         }
 
-        // Panel derecho también con fondo rosita claro
         panelDerecho = new JPanel();
-        panelDerecho.setBackground(new Color(255, 190, 200)); // mismo rosita claro que usaste
+        panelDerecho.setBackground(new Color(255, 190, 200));
         panelDerecho.setLayout(new BorderLayout());
 
         add(panelIzquierdo, BorderLayout.WEST);
@@ -45,18 +54,20 @@ public class VentanaCliente extends JFrame {
         if ("Ver Perfil".equals(accion)) {
             mostrarPerfil();
         } 
-        else if("Comprar Tiquete".equals(accion)) {
-        	mostrarFormularioComprarTiquete();}
-        else if("Cerrar Sesión".equals(accion)) {
-            this.dispose();}
-        
+        else if ("Comprar Tiquete".equals(accion)) {
+            panelDerecho.add(new PanelCompraTiquetes(parque, clienteActual));
+        }
+        else if ("Ver Atracciones Disponibles".equals(accion)) {
+            mostrarAtraccionesDisponibles();
+        }
+        else if ("Cerrar Sesión".equals(accion)) {
+            this.dispose();
+        }
 
-            panelDerecho.revalidate();
-            panelDerecho.repaint();
-        
+        panelDerecho.revalidate();
+        panelDerecho.repaint();
     }
 
-    
     private void mostrarPerfil() {
         panelDerecho.removeAll();
         panelDerecho.setLayout(new GridBagLayout());
@@ -65,23 +76,12 @@ public class VentanaCliente extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         int fila = 0;
 
-        // Título
         gbc.gridx = 0;
         gbc.gridy = fila++;
         gbc.gridwidth = 2;
         JLabel titulo = new JLabel("Perfil del Cliente");
         titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
         panelDerecho.add(titulo, gbc);
-
-        // Simulación de cliente, reemplaza con tu objeto real
-        class Cliente {
-            String getNombre() { return "Juan"; }
-            String getApellido() { return "Pérez"; }
-            String getIdentificacion() { return "12345678"; }
-            int getEdad() { return 30; }
-            int getEstatura() { return 175; }
-        }
-        Cliente cliente = new Cliente();
 
         gbc.gridwidth = 1;
 
@@ -91,7 +91,7 @@ public class VentanaCliente extends JFrame {
         panelDerecho.add(new JLabel("Nombre:"), gbc);
 
         gbc.gridx = 1;
-        JLabel valorNombre = new JLabel(cliente.getNombre());
+        JLabel valorNombre = new JLabel(clienteActual.getNombre());
         valorNombre.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelDerecho.add(valorNombre, gbc);
         fila++;
@@ -102,7 +102,7 @@ public class VentanaCliente extends JFrame {
         panelDerecho.add(new JLabel("Apellido:"), gbc);
 
         gbc.gridx = 1;
-        JLabel valorApellido = new JLabel(cliente.getApellido());
+        JLabel valorApellido = new JLabel(clienteActual.getApellido());
         valorApellido.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelDerecho.add(valorApellido, gbc);
         fila++;
@@ -113,7 +113,7 @@ public class VentanaCliente extends JFrame {
         panelDerecho.add(new JLabel("Identificación:"), gbc);
 
         gbc.gridx = 1;
-        JLabel valorIdentificacion = new JLabel(cliente.getIdentificacion());
+        JLabel valorIdentificacion = new JLabel(clienteActual.getIdentificacion());
         valorIdentificacion.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelDerecho.add(valorIdentificacion, gbc);
         fila++;
@@ -124,7 +124,7 @@ public class VentanaCliente extends JFrame {
         panelDerecho.add(new JLabel("Edad:"), gbc);
 
         gbc.gridx = 1;
-        JLabel valorEdad = new JLabel(String.valueOf(cliente.getEdad()));
+        JLabel valorEdad = new JLabel(String.valueOf(clienteActual.getEdad()));
         valorEdad.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelDerecho.add(valorEdad, gbc);
         fila++;
@@ -135,7 +135,7 @@ public class VentanaCliente extends JFrame {
         panelDerecho.add(new JLabel("Estatura:"), gbc);
 
         gbc.gridx = 1;
-        JLabel valorEstatura = new JLabel(cliente.getEstatura() + " cm");
+        JLabel valorEstatura = new JLabel(clienteActual.getEstatura() + " cm");
         valorEstatura.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelDerecho.add(valorEstatura, gbc);
         fila++;
@@ -143,69 +143,30 @@ public class VentanaCliente extends JFrame {
         panelDerecho.revalidate();
         panelDerecho.repaint();
     }
-    
-    private void mostrarFormularioComprarTiquete() {
+
+    private void mostrarAtraccionesDisponibles() {
         panelDerecho.removeAll();
-        panelDerecho.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.anchor = GridBagConstraints.WEST;
-        int fila = 0;
+        panelDerecho.setLayout(new BorderLayout());
 
-        // Título
-        gbc.gridx = 0;
-        gbc.gridy = fila++;
-        gbc.gridwidth = 2;
-        JLabel titulo = new JLabel("Comprar Tiquete");
+        JLabel titulo = new JLabel("Atracciones Disponibles");
         titulo.setFont(new Font("SansSerif", Font.BOLD, 18));
-        panelDerecho.add(titulo, gbc);
+        titulo.setHorizontalAlignment(JLabel.CENTER);
+        panelDerecho.add(titulo, BorderLayout.NORTH);
 
-        // Etiqueta y ComboBox tipo de tiquete
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        gbc.gridy = fila;
-        panelDerecho.add(new JLabel("Tipo de Tiquete:"), gbc);
+        String[] columnNames = {"Nombre", "Tipo", "Restricciones"};
+        Object[][] data = parque.getAtracciones().stream()
+            .map(a -> new Object[]{
+                a.getNombre(),
+                a.getClass().getSimpleName(),
+                a.getRestricciones().toString(),
+            })
+            .toArray(Object[][]::new);
 
-        gbc.gridx = 1;
-        JComboBox<String> comboTipos = new JComboBox<>(new String[] {
-            "Básico - acceso general", 
-            "VIP - acceso prioritario y descuentos", 
-            "Premium - todo VIP + ilimitado + souvenirs"
-        });
-        comboTipos.setPreferredSize(new Dimension(250, 25));
-        panelDerecho.add(comboTipos, gbc);
-        fila++;
-
-        // Etiqueta y ComboBox atracciones
-        gbc.gridx = 0;
-        gbc.gridy = fila;
-        panelDerecho.add(new JLabel("Atracción:"), gbc);
-
-        gbc.gridx = 1;
-        // Simulamos las atracciones disponibles, en tu código usa parque.getAtracciones()
-        JComboBox<String> comboAtracciones = new JComboBox<>(new String[] {
-            "Montaña Rusa", "Casa Embrujada", "Rueda de la Fortuna"
-        });
-        comboAtracciones.setPreferredSize(new Dimension(250, 25));
-        panelDerecho.add(comboAtracciones, gbc);
-        fila++;
-
-        // Botón comprar (aún sin funcionalidad)
-        gbc.gridx = 0;
-        gbc.gridy = fila;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        JButton btnComprar = new JButton("Comprar Tiquete");
-        panelDerecho.add(btnComprar, gbc);
+        JTable tabla = new JTable(data, columnNames);
+        JScrollPane scrollPane = new JScrollPane(tabla);
+        panelDerecho.add(scrollPane, BorderLayout.CENTER);
 
         panelDerecho.revalidate();
         panelDerecho.repaint();
-    }
-
-
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(VentanaCliente::new);
     }
 }

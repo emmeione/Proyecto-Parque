@@ -1,13 +1,15 @@
 package Usuarios;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import Administrador.Parque;
 import Atracciones.Atraccion;
+import GeneradorTiqueteQR.TiqueteVentana;
 import Tiquetes.Tiquete;
 import Tiquetes.TiqueteFamiliar;
-import snippet.TiqueteVentana;
 
 public class Cliente extends Usuario {
 
@@ -60,8 +62,28 @@ public class Cliente extends Usuario {
         if (parque.puedeComprarTiquete(this, atraccion)) {
             super.comprarTiquete(tiquete, atraccion, parque);
             System.out.println("(Compra administrativa)");
+
+            // Mostrar ventana gráfica con el QR
+            TiqueteVentana.mostrarTiquete(this);
+
+            // Crear carpeta si no existe
+            File carpeta = new File("./tiquetes_generados/");
+            if (!carpeta.exists()) {
+                carpeta.mkdirs();
+            }
+
+            // Guardar imagen del tiquete
+            try {
+                TiqueteVentana panel = new TiqueteVentana(this);
+                String nombreArchivo = "./tiquetes_generados/tiquete_" + tiquete.getCodigo() + ".png";
+                panel.guardarImagenTiquete(nombreArchivo);
+            } catch (IOException e) {
+                System.err.println("No se pudo guardar la imagen del tiquete: " + e.getMessage());
+            }
         }
     }
+
+
 
     @Override
     public String getTipo() {

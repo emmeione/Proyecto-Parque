@@ -49,13 +49,15 @@ public class Parque {
     private ArrayList<Empleado> empleados;
     private ArrayList<Administrador> administradores;
     private ArrayList<Tiquete> tiquetes;
-    private Map<String, Usuario> usuarios;
+    private Map<String, Usuario> usuariosPorId;
     private ArrayList<Lugar> lugares;
     private PersistenciaUsuarios persistenciaUsuarios;
     private PersistenciaAtracciones persistenciaAtracciones;
     private ArrayList<Tiquete> tiquetesVendidos;
     private PersistenciaTiquetes persistenciaTiquetes;
     private Tiquetera tiquetera;
+    private Administrador administradorActual;
+
 
 
 
@@ -67,7 +69,7 @@ public class Parque {
         this.clientes = new ArrayList<>();
         this.empleados = new ArrayList<>();
         this.tiquetes = new ArrayList<>();
-        this.usuarios = new HashMap<>();
+        this.usuariosPorId = new HashMap<>();
         this.lugares = new ArrayList<>();
         this.persistenciaUsuarios = new PersistenciaUsuarios(this);
         this.persistenciaAtracciones = new PersistenciaAtracciones(this);
@@ -80,32 +82,44 @@ public class Parque {
     }
 
     public void registrarCliente(Cliente cliente) {
-        if (usuarios.containsKey(cliente.getNombre())) {
-            System.out.println("Cliente ya registrado con ese nombre.");
+        if (usuariosPorId.containsKey(cliente.getIdentificacion())) {
+            System.out.println("Cliente ya registrado con ID: " + cliente.getIdentificacion());
             return;
         }
         clientes.add(cliente);
-        usuarios.put(cliente.getNombre(), cliente);
-        System.out.println("Cliente registrado con éxito.");
+        usuariosPorId.put(cliente.getIdentificacion(), cliente);
     }
 
 
     public void registrarEmpleado(Empleado empleado) {
+        if (usuariosPorId.containsKey(empleado.getIdentificacion())) {
+            System.out.println("Empleado ya registrado con esta ID.");
+            return;
+        }
         empleados.add(empleado);
-        usuarios.put(empleado.getNombre(), empleado);
-        System.out.println("Empleado registrado con éxito.");
+        usuariosPorId.put(empleado.getIdentificacion(), empleado);
     }
     
     public void registrarAdministrador(Administrador administrador) {
-        if (usuarios.containsKey(administrador.getNombre())) {
-            System.out.println("Administrador ya registrado con ese nombre.");
+        if (usuariosPorId.containsKey(administrador.getIdentificacion())) {
+            System.out.println("Administrador ya registrado con ID: " + administrador.getIdentificacion());
             return;
         }
         administradores.add(administrador);
-        usuarios.put(administrador.getNombre(), administrador);
-        System.out.println("Administrador registrado con éxito.");
+        usuariosPorId.put(administrador.getIdentificacion(), administrador);
     }
-
+    
+    public Usuario buscarUsuarioPorId(String id) {
+        return usuariosPorId.get(id);
+    }
+    public Cliente buscarCliente(String login, String password) {
+        for (Cliente cliente : clientes) {
+            if (cliente.getLogin().equals(login) && cliente.getPassword().equals(password)) {
+                return cliente;
+            }
+        }
+        return null;
+    }
 
 
     public void venderTiquete(Tiquete tiquete, Cliente cliente) {
@@ -114,18 +128,18 @@ public class Parque {
         System.out.println("Tiquete vendido al cliente: " + cliente.getNombre());
     }
 
-    public boolean registrarCompraTiquete(String nombreUsuario, Atraccion atraccion, Tiquete tiquete) {
-        Usuario usuario = usuarios.get(nombreUsuario);
+    public boolean registrarCompraTiquete(Usuario usuario, Atraccion atraccion, Tiquete tiquete) {
         if (usuario == null) {
-            System.out.println("Usuario no encontrado.");
+            System.out.println("Usuario no puede ser null.");
             return false;
         }
-
         if (!puedeComprarTiquete(usuario, atraccion)) {
             return false;
         }
 
         tiquete.setComprador(usuario);
+        usuario.agregarTiquete(tiquete);
+
         
         if (!tiquetes.contains(tiquete)) {
             tiquetes.add(tiquete);
@@ -138,6 +152,7 @@ public class Parque {
         return true;
     }
 
+
     public boolean puedeComprarTiquete(Usuario usuario, Atraccion atraccion) {
         if (atraccion.getTiquetesVendidos() >= atraccion.getCupoMaximoClientes()) {
             System.out.println("No hay cupo disponible.");
@@ -147,23 +162,6 @@ public class Parque {
     }
 
 
-    public Cliente buscarClientePorLogin(String login) {
-        for (Usuario u : usuarios.values()) {  
-            if (u instanceof Cliente && u.getLogin().equals(login)) {
-                return (Cliente) u;
-            }
-        }
-        return null;
-    }
-
-    public Administrador buscarAdministradorPorLogin(String login) {
-        for (Usuario u : usuarios.values()) { 
-            if (u instanceof Administrador && u.getLogin().equals(login)) {
-                return (Administrador) u;
-            }
-        }
-        return null;
-    }
 
 
     public boolean puedeComprarTiquete(Cliente cliente, Atraccion atraccion) {
@@ -260,6 +258,15 @@ public class Parque {
         }
     }
 
+    public Empleado buscarEmpleado(String email, String contrasena) {
+        for (Empleado e : empleados) {
+            if (e.getLogin().equals(email) && e.getPassword().equals(contrasena)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
 
     
     public boolean usarTiqueteParaAtraccion(Tiquete tiquete, Atraccion atraccion, Usuario usuario) {
@@ -298,14 +305,6 @@ public class Parque {
         return null;
     }
 
-    public Empleado buscarEmpleadoPorNombre(String nombre) {
-        for (Empleado empleado : empleados) {
-            if (empleado.getNombre().equalsIgnoreCase(nombre)) {
-                return empleado;
-            }
-        }
-        return null;
-    }
 
     public Atraccion buscarAtraccionPorNombre(String nombre) {
         for (Atraccion atraccion : atracciones) {
@@ -336,9 +335,7 @@ public class Parque {
         lugares.add(lugar);
     }
 
-    public Usuario buscarUsuarioPorNombre(String id) {
-        return usuarios.get(id);
-    }
+  
 
     public void registrarTiquete(Tiquete tiquete) {
         this.tiquetes.add(tiquete);
@@ -360,34 +357,21 @@ public class Parque {
     }
     
     public Collection<Usuario> getUsuarios() {
-        return usuarios.values();
+        return usuariosPorId.values();
     }
     
     public ArrayList<Cliente> getClientes() {
-        for (Usuario u : usuarios.values()) {
-            if (u instanceof Cliente) {
-                clientes.add((Cliente) u);
-            }
-        }
-        return clientes;
+        return new ArrayList<>(clientes); // Retorna copia, no modifica
     }
     
     public ArrayList<Empleado> getEmpleados() {
-        for (Usuario u : usuarios.values()) {
-            if (u instanceof Empleado) {
-                empleados.add((Empleado) u);
-            }
-        }
-        return empleados;
+        return new ArrayList<>(empleados);
     }
+
     public ArrayList<Administrador> getAdministradores() {
-        for (Usuario u : usuarios.values()) {
-            if (u instanceof Administrador) {
-                administradores.add((Administrador) u);
-            }
-        }
-        return administradores;
+        return new ArrayList<>(administradores);
     }
+
 
     public ArrayList<Atraccion> getAtracciones() { return atracciones; }
     public ArrayList<Tiquete> getTiquetes() { return tiquetes; }
@@ -499,6 +483,7 @@ public class Parque {
 
         return catalogo;
     }
+
 
     public Map<String, Tiquete> crearTiquetesDesdeCatalogo(Map<String, List<Atraccion>> catalogo) {
         Map<String, Tiquete> tiquetes = new HashMap<>();
@@ -613,6 +598,14 @@ public class Parque {
 
     public void setTiquetera(Tiquetera tiquetera) {
         this.tiquetera = tiquetera;
+    }
+    
+    public void setAdministradorActual(Administrador admin) {
+        this.administradorActual = admin;
+    }
+
+    public Administrador getAdministradorActual() {
+        return administradorActual;
     }
 
 

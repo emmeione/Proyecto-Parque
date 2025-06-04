@@ -85,7 +85,7 @@ public class PersistenciaTiquetes {
 	        }
 	        tiquetesExistentes.put(codigo, true);
 
-	        Usuario compradorr = parque.buscarUsuarioPorNombre(comprador);
+	        Usuario compradorr = parque.buscarUsuarioPorId(comprador);
 	        if (compradorr == null) {
 	            System.out.println("Comprador no encontrado: " + comprador);
 	            linea = lector.readLine();

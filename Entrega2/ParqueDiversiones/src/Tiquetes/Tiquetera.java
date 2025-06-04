@@ -3,10 +3,12 @@ package Tiquetes;
 import Tiquetes.Tiquete;
 import Usuarios.Cliente;
 import Usuarios.Usuario;
-import snippet.TiqueteVentana;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import GeneradorTiqueteQR.TiqueteVentana;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -19,12 +21,17 @@ public class Tiquetera {
     private ArrayList<Tiquete> tiquetes;
 
     public static void mostrarYGuardarTiquete(Usuario usuario) {
-        TiqueteVentana panel = new TiqueteVentana(usuario);
         Tiquete tiquete = usuario.getUltimoTiquete();
+        if (tiquete == null) {
+            System.out.println("El usuario no tiene tiquetes para mostrar.");
+            return;
+        }
+
+        TiqueteVentana panel = new TiqueteVentana(usuario);
 
         String codigo = tiquete.getCodigo();
         String rutaImagen = "./tiquetes/" + codigo + ".png";
-        
+
         try {
             File dir = new File("./tiquetes/");
             if (!dir.exists()) dir.mkdirs();

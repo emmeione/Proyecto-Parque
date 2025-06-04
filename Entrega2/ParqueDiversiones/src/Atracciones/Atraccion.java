@@ -16,7 +16,7 @@ public abstract class Atraccion {
     protected NivelExclusividad nivelExclusividad;
     protected int tiquetesVendidos = 0;
 
-
+  
 //    Método constructor
     public Atraccion(String nombre, int cupoMaximoClientes, int cupoMinimoEncargados, ArrayList<Restriccion> restricciones, NivelExclusividad nivelExclusividad) {
         this.nombre = nombre;
